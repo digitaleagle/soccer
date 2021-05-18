@@ -31,6 +31,8 @@ class Game extends Event {
   final List<int> captains = [];
   int currentQuarter = 1;
 
+  bool get hasAttendance => (attendees.length > 0);
+
   String toJSON() {
     var playerPositions = [];
     for(var position in this.playerPositions) {

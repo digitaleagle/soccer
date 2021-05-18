@@ -189,7 +189,6 @@ class StorageServiceImpl extends StorageService {
     final prefs = await SharedPreferences.getInstance();
 
     String json = prefs.get("Comm$id");
-    print("loading communication: $json");
     return Communication.fromJSON(json);
   }
   Future<void> saveCommunication(Communication communication) async {
@@ -336,7 +335,9 @@ class StorageServiceImpl extends StorageService {
   Future<RestoreResult> restoreUpdate(String json) async {
     var result = RestoreResult();
     try {
-      var teamMap = Map<int, dynamic>();
+      var gameMap = Map<int, Team>();
+      var playerMap = Map<int, Team>();
+      var practiceMap = Map<int, Team>();
 
       var obj = jsonDecode(json);
       List teams = obj["teams"];
@@ -350,6 +351,7 @@ class StorageServiceImpl extends StorageService {
           shouldLoad = true;
           team.id = -1;
         }
+        var fileTeam = team;
         if(shouldLoad) {
           this.saveTeam(team);
         } else {
@@ -358,35 +360,101 @@ class StorageServiceImpl extends StorageService {
           }
         }
 
-        for(int gameId in team.gameIds) {
-          teamMap[gameId] = team;
+        for(int gameId in fileTeam.gameIds) {
+          gameMap[gameId] = team;
         }
+        for(int playerId in fileTeam.playerIds) {
+          playerMap[playerId] = team;
+        }
+        for(int practiceId in fileTeam.practiceIds) {
+          practiceMap[practiceId] = team;
+        }
+        // Clear them so we add the players back
+        team.playerIds.clear();
+        team.gameIds.clear();
+        team.practiceIds.clear();
+        this.saveTeam(team);
       }
 
-      /*
       List players = obj["players"];
       for (var strPlayer in players) {
         Player player = Player.fromJSON(strPlayer);
-        this.savePlayer(player);
-        result.playersLoaded++;
+        var shouldLoad = false;
+        try {
+          var existing = await this.getPlayer(player.id);
+          if(player.hasPreferences && !existing.hasPreferences) {
+            shouldLoad = true;
+          }
+        } catch (e) {
+          shouldLoad = true;
+        }
+        var team = playerMap[player.id];
+        var isDuplicate = false;
+        for(var existingId in team.playerIds) {
+          var existing = await this.getPlayer(existingId);
+          if(existing.name == player.name) {
+            // this is a duplicate
+            shouldLoad = false;
+            isDuplicate = true;
+          }
+        }
+        if(shouldLoad) {
+          this.savePlayer(player);
+          result.playersLoaded++;
+        }
+        if(!isDuplicate) {
+          // add back to the team
+          team.playerIds.add(player.id);
+          this.saveTeam(team);
+        }
       }
 
       List games = obj["games"];
       for (var strGame in games) {
         Game game = Game.fromJSON(strGame);
-        await game.loadTeam(teamMap[game.id]);
-        this.saveGame(game);
-        result.gamesLoaded++;
+
+        // add back to the team -- have to do this early because the getGame() checks
+        var team = gameMap[game.id];
+        team.gameIds.add(game.id);
+        this.saveTeam(team);
+
+        var shouldLoad = false;
+        try {
+          var existing = await this.getGame(game.id);
+          if(!existing.hasAttendance && game.hasAttendance) {
+            shouldLoad = true;
+          }
+        } catch(e) {
+          shouldLoad = true;
+        }
+        if(shouldLoad) {
+          await game.loadTeam(gameMap[game.id]);
+          this.saveGame(game);
+          result.gamesLoaded++;
+        }
       }
 
       List practices = obj["practices"];
       for (var strPractice in practices) {
         Practice practice = Practice.fromJSON(strPractice);
-        this.savePractice(practice);
-        result.practicesLoaded++;
+        var shouldLoad = false;
+        try {
+          var existing = await this.getPractice(practice.id);
+          if(!existing.hasAttendance && practice.hasAttendance) {
+            shouldLoad = true;
+          }
+        } catch(e) {
+          shouldLoad = true;
+        }
+        if(shouldLoad) {
+          this.savePractice(practice);
+          result.practicesLoaded++;
+        }
+        // add back to the team
+        var team = practiceMap[practice.id];
+        team.practiceIds.add(practice.id);
+        this.saveTeam(team);
       }
-
-       */
 
       if(obj["communications"] != null) {
         for(String strCommunication in obj["communications"]) {

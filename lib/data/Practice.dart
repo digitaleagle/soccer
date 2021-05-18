@@ -11,6 +11,8 @@ class Practice extends Event {
   final List<int> attendees = [];
   final List<int> goalies = [];
 
+  bool get hasAttendance => (attendees.length > 0);
+
   String toJSON() {
     Object obj = {
       "id": id,

@@ -31,6 +31,25 @@ class Player extends Reflectable {
   double defensePref = 0;
   double sweeperPref = 0;
 
+  bool get hasPreferences {
+    if(goaliePref > 0) {
+      return true;
+    }
+    if(forwardPref > 0) {
+      return true;
+    }
+    if(midFieldPref > 0) {
+      return true;
+    }
+    if(defensePref > 0) {
+      return true;
+    }
+    if(sweeperPref > 0) {
+      return true;
+    }
+    return false;
+  }
+
 
   String toJSON() {
     Object obj = {
