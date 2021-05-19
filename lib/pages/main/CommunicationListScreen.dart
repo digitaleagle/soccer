@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:soccer/data/Communication.dart';
 import 'package:soccer/nav/args/CommunicationArgs.dart';
-import 'package:soccer/nav/args/TeamArgs.dart';
 import 'package:soccer/pages/main/CommunicationMain.dart';
-import 'package:soccer/pages/setup/TeamSetup.dart';
 import 'package:soccer/service/StorageService.dart';
 import 'package:soccer/service/serviceLocator.dart';
-import 'package:telephony/telephony.dart';
 
 class CommunicationListScreen extends StatefulWidget {
   static String route = "/communications";
@@ -64,16 +61,6 @@ class _CommunicationListScreenState extends State {
                         },
                       ),
                     ),
-                  ),
-                  ElevatedButton(
-                    child: Text("Test SMS"),
-                    onPressed: () async {
-                      final Telephony telephony = Telephony.instance;
-                      bool permissionsGranted =
-                          await telephony.requestPhoneAndSmsPermissions;
-                      telephony.sendSms(
-                          to: "****", message: "Testing my soccer app!!");
-                    },
                   ),
                 ],
               );
