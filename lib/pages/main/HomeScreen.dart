@@ -5,8 +5,10 @@ import 'package:soccer/data/Team.dart';
 import 'package:soccer/nav/NavDrawer.dart';
 import 'package:soccer/data/EventItem.dart';
 import 'package:soccer/nav/args/EventArgs.dart';
+import 'package:soccer/nav/args/TeamArgs.dart';
 import 'package:soccer/pages/main/GameMain.dart';
 import 'package:soccer/pages/main/PracticeMain.dart';
+import 'package:soccer/pages/setup/TeamSetup.dart';
 import 'package:soccer/service/StorageService.dart';
 import 'package:soccer/service/serviceLocator.dart';
 
@@ -34,29 +36,51 @@ class _HomeScreenState extends State {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List<EventItem> events = snapshot.data;
-                return ListView.builder(
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    EventItem event = events[index];
-                    return ListTile(
-                      title: Text(event.descr),
-                      leading: CircleAvatar(
-                        backgroundColor: event.eventType == EventType.Practice
-                            ? Colors.green
-                            : Colors.red,
-                        child: Text(
-                            event.eventType == EventType.Practice ? "P" : "G"),
+                if (events.length == 0) {
+                  return ListView(
+                    children: [
+                      ListTile(
+                        title: Text("Click Here to Make a Team"),
+                        tileColor: Colors.black12,
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, TeamSetup.route, arguments: TeamArgs(
+                              -1));
+                        },
                       ),
-                      onTap: () {
-                        var route = event.eventType == EventType.Practice
-                            ? PracticeMain.route
-                            : GameMain.route;
-                        Navigator.pushNamed(context, route,
-                            arguments: EventArgs(event.event.id, event.team));
-                      },
-                    );
-                  },
-                );
+                      ListTile(
+                        title: Text("You currently have no teams"),
+                        tileColor: Colors.white,
+                      )
+                    ],
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: events.length,
+                    itemBuilder: (context, index) {
+                      EventItem event = events[index];
+                      return ListTile(
+                        title: Text(event.descr),
+                        leading: CircleAvatar(
+                          backgroundColor: event.eventType == EventType.Practice
+                              ? Colors.green
+                              : Colors.red,
+                          child: Text(
+                              event.eventType == EventType.Practice
+                                  ? "P"
+                                  : "G"),
+                        ),
+                        onTap: () {
+                          var route = event.eventType == EventType.Practice
+                              ? PracticeMain.route
+                              : GameMain.route;
+                          Navigator.pushNamed(context, route,
+                              arguments: EventArgs(event.event.id, event.team));
+                        },
+                      );
+                    },
+                  );
+                }
               } else {
                 return CircularProgressIndicator();
               }
@@ -71,20 +95,20 @@ class _HomeScreenState extends State {
     DateTime showAfter = DateTime.now().subtract(new Duration(days: 1));
     for (Team team in teams) {
       for (Practice practice in await team.practices) {
-        if(practice.eventDate.isAfter(showAfter)) {
+        if (practice.eventDate.isAfter(showAfter)) {
           EventItem event =
           EventItem(EventType.Practice, practice.id, practice, team);
           list.add(event);
         }
       }
       for (Game game in await team.games) {
-        if(game.eventDate.isAfter(showAfter)) {
+        if (game.eventDate.isAfter(showAfter)) {
           EventItem event = EventItem(EventType.Game, game.id, game, team);
           list.add(event);
         }
       }
     }
-    list.sort((a,b) => a.event.eventDate.compareTo(b.event.eventDate));
+    list.sort((a, b) => a.event.eventDate.compareTo(b.event.eventDate));
     return list;
   }
 }
