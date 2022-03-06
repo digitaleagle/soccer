@@ -1,16 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:intl/intl.dart';
 import 'package:soccer/data/Game.dart';
-import 'package:soccer/data/GamePosition.dart';
 import 'package:soccer/data/Team.dart';
 import 'package:soccer/nav/args/PlayerArgs.dart';
-import 'package:soccer/nav/args/PositionSelectArgs.dart';
 import 'package:soccer/nav/args/TeamArgs.dart';
 import 'package:soccer/pages/main/CaptainList.dart';
-import 'package:soccer/pages/main/GamePositionWidget.dart';
-import 'package:soccer/pages/main/PositionSelector.dart';
 import 'package:soccer/pages/setup/PlayerSetup.dart';
 import 'package:soccer/service/StorageService.dart';
 import 'package:soccer/service/serviceLocator.dart';

@@ -217,7 +217,7 @@ class _TeamSelectorState extends State<TeamSelector> {
   Widget build(BuildContext context) {
     print("building team selector ... ${selection.team.name} -- ${selection.selected}");
     return CheckboxListTile(
-      title: Text(this.title),
+      title: Text(title),
       value: selection.selected,
       onChanged: (value) {
         setState(() {

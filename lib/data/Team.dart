@@ -97,14 +97,14 @@ class Team {
     StorageService storage = locator<StorageService>();
 
     if (_players == null || _players!.length == 0) {
-      this._players = [];
-      for (int id in this.playerIds) {
+      _players = [];
+      for (int id in playerIds) {
         Player player = await storage.getPlayer(id);
         if (player == null) {
           print("Player failed to load for player list (id $id)");
           throw Exception("Player failed to load for player list (id $id)");
         }
-        this._players!.add(player);
+        _players!.add(player);
       }
     }
     return _players!;
@@ -123,8 +123,8 @@ class Team {
   Future<List<Game>> get games async {
     StorageService storage = locator<StorageService>();
 
-    if (_games == null || _games!.length == 0) {
-      this._games = [];
+    if (_games == null || _games!.isEmpty) {
+      _games = [];
       for (int id in gameIds) {
         _games!.add(await storage.getGame(id));
       }
@@ -137,7 +137,7 @@ class Team {
     if (game.id <= 0) {
       throw Exception("Game must be saved first");
     }
-    this.gameIds.add(game.id);
+    gameIds.add(game.id);
     if (_games != null) {
       _games!.add(game);
     }
@@ -146,9 +146,9 @@ class Team {
   Future<List<Practice>> get practices async {
     StorageService storage = locator<StorageService>();
 
-    if (this._practices == null || _practices!.length == 0) {
-      this._practices = [];
-      for (int id in this.practiceIds) {
+    if (_practices == null || _practices!.length == 0) {
+      _practices = [];
+      for (int id in practiceIds) {
         _practices!.add(await storage.getPractice(id));
       }
     }

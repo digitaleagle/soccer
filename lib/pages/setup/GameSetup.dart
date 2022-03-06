@@ -23,11 +23,11 @@ class _GameSetupState extends State<GameSetup> {
   final TextEditingController fieldController = TextEditingController();
   final TextEditingController opponentController = TextEditingController();
   final TextEditingController refreshemntsController = TextEditingController();
-
+  late EventArgs args;
 
   @override
   Widget build(BuildContext context) {
-    final EventArgs args = ModalRoute.of(context)!.settings.arguments as EventArgs;
+    args = ModalRoute.of(context)!.settings.arguments as EventArgs;
     final _formKey = GlobalKey<FormState>();
 
     return Scaffold(
@@ -135,9 +135,15 @@ class _GameSetupState extends State<GameSetup> {
   }
 
   Future<Game> getGame(int id) async {
+    Game? game;
     if (id <= 0) {
-      return Game(eventDate: DateTime. now());
+      game = Game(eventDate: DateTime. now());
+    } else {
+      game = await storage.getGame(id);
     }
-    return await storage.getGame(id);
+    if(game.teamId != args.team.id) {
+      game.teamId = args.team.id;
+    }
+    return game;
   }
 }

@@ -147,7 +147,15 @@ class StorageServiceImpl extends StorageService {
       throw Exception("Game doesn't have a team: $id");
     }
 
-    game.loadTeam(await this.getTeam(game.teamId));
+    try {
+      game.loadTeam(await this.getTeam(game.teamId));
+    } catch (e, trace) {
+      print("Print this shouldn't happen, but we can't load the team (${game.teamId}) for game #$id");
+      print(e.toString());
+      print(trace);
+      var teamList = await listTeams();
+      game.loadTeam(teamList[0]);
+    }
     return game;
   }
 
