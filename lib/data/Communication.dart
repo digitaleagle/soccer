@@ -58,11 +58,11 @@ class Communication {
       playerList.add(player_obj);
     }
     Object obj = {
-      "id": this.id,
-      "descr": this.descr,
-      "isComplete": this.isComplete,
+      "id": id,
+      "descr": descr,
+      "isComplete": isComplete,
       "items": playerList,
-      "text": this.text,
+      "text": text,
     };
     return jsonEncode(obj);
   }

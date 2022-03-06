@@ -74,10 +74,10 @@ class StorageServiceImpl extends StorageService {
     final prefs = await SharedPreferences.getInstance();
 
     if (team.id <= 0) {
-      TeamList teamList = await this.getTeamList();
+      TeamList teamList = await getTeamList();
       team.id = teamList.nextId++;
       teamList.idList.add(team.id);
-      this.saveTeamList(teamList);
+      saveTeamList(teamList);
     }
 
     prefs.setString("Team${team.id}", team.toJSON());

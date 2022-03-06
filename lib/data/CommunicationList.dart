@@ -6,10 +6,10 @@ class CommunicationList {
 
   String toJSON() {
     Object obj = {
-      "idList": this.idList,
-      "nextId": this.nextId,
+      "idList": idList,
+      "nextId": nextId,
     };
-    print("saving ... ${this.nextId}");
+    print("saving ... ${nextId}");
     return jsonEncode(obj);
   }
 

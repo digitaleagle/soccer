@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:soccer/data/RestoreResult.dart';
@@ -10,6 +8,8 @@ import 'package:soccer/service/serviceLocator.dart';
 
 class DataForm extends StatefulWidget {
   static const route = "/data";
+
+  const DataForm({Key? key}) : super(key: key);
 
   @override
   _DataFormState createState() => _DataFormState();
@@ -24,18 +24,18 @@ class _DataFormState extends State<DataForm> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Soccer: Data"),
+          title: const Text("Soccer: Data"),
         ),
         drawer: NavDrawer(),
         body: Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               Row(
                 children: [
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: ElevatedButton(
                           onPressed: () async {
                             var json = await storage.backup();
@@ -44,21 +44,21 @@ class _DataFormState extends State<DataForm> {
                               dataText.text = json;
                             });
                           },
-                          child: Text("Backup")),
+                          child: const Text("Backup")),
                     ),
                   ),
                   Expanded(child: Container(
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     child: ElevatedButton(
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: dataText.text));
                       },
-                      child: Text("Copy All"),
+                      child: const Text("Copy All"),
                     ),
                   )),
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: ElevatedButton(
                           onPressed: () async {
                             if (dataText.text.isEmpty) {
@@ -76,7 +76,7 @@ class _DataFormState extends State<DataForm> {
                             Navigator.pushNamed(context, LoadResults.route,
                                 arguments: result);
                           },
-                          child: Text("Load")),
+                          child: const Text("Load")),
                     ),
                   ),
                 ],
@@ -85,7 +85,7 @@ class _DataFormState extends State<DataForm> {
                 children: [
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: ElevatedButton(
                           onPressed: () async {
                             if (dataText.text.isEmpty) {
@@ -103,19 +103,34 @@ class _DataFormState extends State<DataForm> {
                             Navigator.pushNamed(context, LoadResults.route,
                                 arguments: result);
                           },
-                          child: Text("Load Update")),
+                          child: const Text("Load Update")),
                     ),
                   ),
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               errorText = "";
                             });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Signing into Google Account")));
                             print("Google signin");
-                            storage.googleSignIn();
+                            try {
+                              await storage.googleSignIn();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Sign in complete")));
+                            } catch (e, trace) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Failed to sign in")));
+                              print("Google Signin Failed: \n ${e.toString()} \n\n$trace");
+                              setState(() {
+                                dataText.text = "${e.toString()}\n\n$trace";
+                                errorText = e.toString();
+                              });
+                            }
                           },
                           child: Text("Google Signin")),
                     ),

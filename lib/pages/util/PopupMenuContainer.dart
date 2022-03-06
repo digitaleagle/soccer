@@ -37,6 +37,10 @@ class PopupMenuContainerState<T> extends State<PopupMenuContainer<T>>{
             ),
           );
 
+          if(value == null) {
+            return;
+          }
+
           widget.onItemSelected(value!);
         },
         child: widget.child

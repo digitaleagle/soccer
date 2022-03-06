@@ -13,11 +13,11 @@ class Team {
   String age = "";
   int playersOnField = 0;
   final List<int> playerIds = [];
-  List<Player> _players = [];
+  List<Player>? _players;
   final List<int> gameIds = [];
-  List<Game> _games = [];
+  List<Game>? _games;
   final List<int> practiceIds = [];
-  List<Practice> _practices = [];
+  List<Practice>? _practices;
   final List<Position> positions = [];
 
   String toJSON() {
@@ -96,7 +96,7 @@ class Team {
   Future<List<Player>> get players async {
     StorageService storage = locator<StorageService>();
 
-    if (this._players == null) {
+    if (_players == null || _players!.length == 0) {
       this._players = [];
       for (int id in this.playerIds) {
         Player player = await storage.getPlayer(id);
@@ -104,33 +104,33 @@ class Team {
           print("Player failed to load for player list (id $id)");
           throw Exception("Player failed to load for player list (id $id)");
         }
-        this._players.add(player);
+        this._players!.add(player);
       }
     }
-    return this._players;
+    return _players!;
   }
 
   addPlayer(Player player) {
     if (player.id <= 0) {
       throw Exception("Player must be saved first");
     }
-    this.playerIds.add(player.id);
-    if (this._players != null) {
-      this._players.add(player);
+    playerIds.add(player.id);
+    if (_players != null) {
+      _players!.add(player);
     }
   }
 
   Future<List<Game>> get games async {
     StorageService storage = locator<StorageService>();
 
-    if (this._games == null) {
+    if (_games == null || _games!.length == 0) {
       this._games = [];
-      for (int id in this.gameIds) {
-        this._games.add(await storage.getGame(id));
+      for (int id in gameIds) {
+        _games!.add(await storage.getGame(id));
       }
     }
 
-    return this._games;
+    return _games!;
   }
 
   addGame(Game game) {
@@ -138,36 +138,38 @@ class Team {
       throw Exception("Game must be saved first");
     }
     this.gameIds.add(game.id);
-    if (this._games != null) {
-      this._games.add(game);
+    if (_games != null) {
+      _games!.add(game);
     }
   }
 
   Future<List<Practice>> get practices async {
     StorageService storage = locator<StorageService>();
 
-    if (this._practices == null) {
+    if (this._practices == null || _practices!.length == 0) {
       this._practices = [];
       for (int id in this.practiceIds) {
-        this._practices.add(await storage.getPractice(id));
+        _practices!.add(await storage.getPractice(id));
       }
     }
 
-    return this._practices;
+    return _practices!;
   }
 
   addPractice(Practice practice) {
     if (practice.id <= 0) {
       throw Exception("Practice must be saved first");
     }
-    this.practiceIds.add(practice.id);
-    if (this._practices != null) {
-      this._practices.add(practice);
+    practiceIds.add(practice.id);
+    if (_practices != null) {
+      _practices!.add(practice);
     }
   }
 
   void removePlayer(Player player) {
-    this._players.remove(player);
-    this.playerIds.remove(player.id);
+    if(_players != null) {
+      _players!.remove(player);
+    }
+    playerIds.remove(player.id);
   }
 }
