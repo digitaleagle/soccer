@@ -12,6 +12,8 @@ import 'package:soccer/pages/setup/TeamSetup.dart';
 import 'package:soccer/service/StorageService.dart';
 import 'package:soccer/service/serviceLocator.dart';
 
+import '../../data/Player.dart';
+
 class HomeScreen extends StatefulWidget {
   static const route = '/';
 
@@ -21,6 +23,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State {
   StorageService storage = locator<StorageService>();
+  late List<Team> teams;
+  late List<Game> games;
+  late List<Player> players;
 
   @override
   Widget build(BuildContext context) {
@@ -37,23 +42,7 @@ class _HomeScreenState extends State {
               if (snapshot.hasData) {
                 List<EventItem> events = snapshot.data!;
                 if (events.length == 0) {
-                  return ListView(
-                    children: [
-                      ListTile(
-                        title: Text("Click Here to Make a Team"),
-                        tileColor: Colors.black12,
-                        onTap: () {
-                          Navigator.pushNamed(
-                              context, TeamSetup.route, arguments: TeamArgs(
-                              -1));
-                        },
-                      ),
-                      ListTile(
-                        title: Text("You currently have no teams"),
-                        tileColor: Colors.white,
-                      )
-                    ],
-                  );
+                  return buildNoEvents();
                 } else {
                   return ListView.builder(
                     itemCount: events.length,
@@ -89,9 +78,65 @@ class _HomeScreenState extends State {
         ));
   }
 
+  Widget buildNoEvents() {
+    if(teams.isEmpty) {
+      return ListView(
+        children: [
+          ListTile(
+            title: Text("Click Here to Make a Team"),
+            tileColor: Colors.black12,
+            onTap: () {
+              Navigator.pushNamed(
+                  context, TeamSetup.route, arguments: TeamArgs(
+                  -1));
+            },
+          ),
+          ListTile(
+            title: Text("You currently have no teams"),
+            tileColor: Colors.white,
+          )
+        ],
+      );
+    } else if(players.length == 0) {
+      return ListView(
+        children: [
+          ListTile(
+            title: Text("Click Here to add players"),
+            tileColor: Colors.black12,
+            onTap: () {
+              Navigator.pushNamed(
+                  context, TeamSetup.route, arguments: TeamArgs(teams[0].id));
+            },
+          ),
+          ListTile(
+            title: Text("You currently have no players in ${teams[0].name}"),
+            tileColor: Colors.white,
+          )
+        ],
+      );
+    } else {
+      return ListView(
+        children: [
+          ListTile(
+            title: Text("Click Here to add a practice/game"),
+            tileColor: Colors.black12,
+            onTap: () {
+              Navigator.pushNamed(
+                  context, TeamSetup.route, arguments: TeamArgs(teams[0].id));
+            },
+          ),
+          ListTile(
+            title: Text("You currently have no practices or games in ${teams[0].name}"),
+            tileColor: Colors.white,
+          )
+        ],
+      );
+    }
+  }
+
   Future<List<EventItem>> loadEvents() async {
     List<EventItem> list = [];
-    List<Team> teams = await storage.listTeams();
+    teams = await storage.listTeams();
     DateTime showAfter = DateTime.now().subtract(new Duration(days: 1));
     for (Team team in teams) {
       for (Practice practice in await team.practices) {
@@ -101,12 +146,16 @@ class _HomeScreenState extends State {
           list.add(event);
         }
       }
-      for (Game game in await team.games) {
+      games = await team.games;
+      for (Game game in games) {
         if (game.eventDate.isAfter(showAfter)) {
           EventItem event = EventItem(EventType.Game, game.id, game, team);
           list.add(event);
         }
       }
+    }
+    if(teams.length > 0) {
+      players = await teams[0].players;
     }
     list.sort((a, b) => a.event.eventDate.compareTo(b.event.eventDate));
     return list;

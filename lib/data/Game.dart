@@ -113,13 +113,13 @@ class Game extends Event {
     for(var position in team.positions) {
       this.positions.add(position);
     }
-    if(_playerPositionsToLoad != null && _playerPositionsToLoad.length > 0) {
+    if(_playerPositionsToLoad != null && _playerPositionsToLoad.isNotEmpty) {
       playerPositions.clear();
       byQuarter[1]!.clear();
       byQuarter[2]!.clear();
       byQuarter[3]!.clear();
       byQuarter[4]!.clear();
-      while(_playerPositionsToLoad.length > 0) {
+      while(_playerPositionsToLoad.isNotEmpty) {
         var p = _playerPositionsToLoad.removeLast();
         Player? foundPlayer;
         Position? foundPosition;
@@ -189,13 +189,11 @@ class Game extends Event {
       }
     }
     if(!found && position != null) {
-      if(gamePlayer == null) {
-        gamePlayer = GamePosition(
-          player: player,
-          position: position,
-          quarter: quarter,
-        );
-      }
+      gamePlayer = gamePlayer ??GamePosition(
+        player: player,
+        position: position,
+        quarter: quarter,
+      );
       byQuarter[quarter]!.add(gamePlayer);
     }
   }

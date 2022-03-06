@@ -9,7 +9,7 @@ class CommunicationList {
       "idList": idList,
       "nextId": nextId,
     };
-    print("saving ... ${nextId}");
+    print("saving ... $nextId");
     return jsonEncode(obj);
   }
 
