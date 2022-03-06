@@ -4,7 +4,7 @@ import 'package:soccer/data/Game.dart';
 class GameCheckboxes extends StatefulWidget {
   final Game game;
 
-  const GameCheckboxes({Key key, this.game}) : super(key: key);
+  const GameCheckboxes({Key? key, required this.game}) : super(key: key);
 
   @override
   _GameCheckboxesState createState() => _GameCheckboxesState(this.game);
@@ -24,9 +24,9 @@ class _GameCheckboxesState extends State {
           child: CheckboxListTile(
             title: Text("Picture Day"),
             controlAffinity: ListTileControlAffinity.leading,
-            onChanged: (bool value) {
+            onChanged: (value) {
               setState(() {
-                game.pictureDay = value;
+                game.pictureDay = value ?? false;
               });
             },
             value: game.pictureDay,
@@ -38,9 +38,9 @@ class _GameCheckboxesState extends State {
             title: Text("Tri-Star"),
             value: game.triStar,
             controlAffinity: ListTileControlAffinity.leading,
-            onChanged: (bool value) {
+            onChanged: (value) {
               setState(() {
-                game.triStar = value;
+                game.triStar = value ?? false;
               });
             },
           ),

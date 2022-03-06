@@ -9,15 +9,15 @@ import 'package:soccer/service/serviceLocator.dart';
 
 class Team {
   int id = -1;
-  String name;
-  String age;
-  int playersOnField;
+  String name = "";
+  String age = "";
+  int playersOnField = 0;
   final List<int> playerIds = [];
-  List<Player> _players;
+  List<Player> _players = [];
   final List<int> gameIds = [];
-  List<Game> _games;
+  List<Game> _games = [];
   final List<int> practiceIds = [];
-  List<Practice> _practices;
+  List<Practice> _practices = [];
   final List<Position> positions = [];
 
   String toJSON() {

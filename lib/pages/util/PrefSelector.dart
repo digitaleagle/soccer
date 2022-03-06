@@ -2,43 +2,39 @@ import 'package:flutter/material.dart';
 
 class PrefSelector extends StatefulWidget {
   final String label;
-  final double value;
-  final ValueChanged<double> onChanged;
+  double value;
+  final ValueChanged<double>? onChanged;
 
-  const PrefSelector({Key key, this.label, this.value, this.onChanged}) : super(key: key);
+  PrefSelector({Key? key, required this.label, required this.value, this.onChanged}) : super(key: key);
 
   @override
-  _PrefSelectorState createState() => _PrefSelectorState(label, value, onChanged);
+  _PrefSelectorState createState() => _PrefSelectorState();
 }
 
-class _PrefSelectorState extends State {
-  final String label;
-  double _value;
-  final ValueChanged<double> onChanged;
-
-  _PrefSelectorState(this.label, this._value, this.onChanged);
-
+class _PrefSelectorState extends State<PrefSelector> {
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(label),
+        Text(widget.label),
         Expanded(
           child: Column(
             children: [
               Container(
                 padding: EdgeInsets.fromLTRB(20, 5, 0, 0),
                   alignment: Alignment.centerLeft,
-                  child: Text(getDescrValue(_value))),
+                  child: Text(getDescrValue(widget.value))),
               Slider(
                 min: 0,
                 max: 5,
                 divisions: 5,
-                value: _value,
-                label: getDescrValue(_value),
-                onChanged: (value) {
-                  _value = value.roundToDouble();
-                  onChanged(_value);
+                value: widget.value,
+                label: getDescrValue(widget.value),
+                onChanged: (newValue) {
+                  widget.value = newValue.roundToDouble();
+                  if(widget.onChanged != null) {
+                    widget.onChanged!(widget.value);
+                  }
                   setState(() {});
                 },
               )

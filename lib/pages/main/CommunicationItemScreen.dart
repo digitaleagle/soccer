@@ -16,9 +16,12 @@ class _CommunicationItemState extends State {
 
   @override
   Widget build(BuildContext context) {
-    final CommunicationArgs args = ModalRoute.of(context).settings.arguments;
+    final CommunicationArgs args = ModalRoute.of(context)!.settings.arguments as CommunicationArgs;
     var communication = args.communication;
     var player = args.player;
+    if(communication == null) {
+      throw Exception("Screen can't have null communication");
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -28,12 +31,15 @@ class _CommunicationItemState extends State {
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
-            Text("Player: ${player.player.name}"),
+            Text("Player: ${player!.player.name}"),
             CheckboxListTile(
               title: Text("Player Communication Complete?"),
               value: player.complete,
               onChanged: (value) async {
-                player.complete = value;
+                player.complete = value ?? false;
+                if(communication == null) {
+                  throw Exception("Can't save null communication");
+                }
                 await storage.saveCommunication(communication);
                 setState(() {});
               },
@@ -60,7 +66,10 @@ class _CommunicationItemState extends State {
                               controlAffinity: ListTileControlAffinity.leading,
                               value: item.sent,
                               onChanged: (value) async {
-                                item.sent = value;
+                                item.sent = value ?? false;
+                                if(communication == null) {
+                                  throw Exception("Can't save null communication");
+                                }
                                 await storage.saveCommunication(communication);
                                 setState(() {});
                               }),
@@ -69,7 +78,10 @@ class _CommunicationItemState extends State {
                               controlAffinity: ListTileControlAffinity.leading,
                               value: item.complete,
                               onChanged: (value) async {
-                                item.complete = value;
+                                item.complete = value ?? false;
+                                if(communication == null) {
+                                  throw Exception("Can't save null communication");
+                                }
                                 await storage.saveCommunication(communication);
                                 setState(() {});
                               }),
@@ -80,7 +92,10 @@ class _CommunicationItemState extends State {
                                 controlAffinity: ListTileControlAffinity.leading,
                                 value: item.leftMessage,
                                 onChanged: (value) async {
-                                  item.leftMessage = value;
+                                  item.leftMessage = value ?? false;
+                                  if(communication == null) {
+                                    throw Exception("Can't save null communication");
+                                  }
                                   await storage.saveCommunication(communication);
                                   setState(() {});
                                 }),
@@ -92,7 +107,10 @@ class _CommunicationItemState extends State {
                                 controlAffinity: ListTileControlAffinity.leading,
                                 value: item.noAnswer,
                                 onChanged: (value) async {
-                                  item.noAnswer = value;
+                                  item.noAnswer = value ?? false;
+                                  if(communication == null) {
+                                    throw Exception("Can't save null communication");
+                                  }
                                   await storage.saveCommunication(communication);
                                   setState(() {});
                                 }),
@@ -107,7 +125,7 @@ class _CommunicationItemState extends State {
 
                             final Telephony telephony = Telephony.instance;
                             bool permissionsGranted =
-                            await telephony.requestPhoneAndSmsPermissions;
+                            (await telephony.requestPhoneAndSmsPermissions) ?? false;
 
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(SnackBar(
@@ -134,6 +152,9 @@ class _CommunicationItemState extends State {
 
 
                             item.sent = true;
+                            if(communication == null) {
+                              throw Exception("Can't save null communication");
+                            }
                             await storage.saveCommunication(communication);
                             setState(() {});
 

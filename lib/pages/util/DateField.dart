@@ -4,32 +4,26 @@ import 'package:intl/intl.dart';
 class DateField extends StatefulWidget {
   final String labelText;
   final DateEditingController controller;
-  final FormFieldValidator<DateTime> validator;
+  final FormFieldValidator<DateTime>? validator;
 
-  const DateField({Key key, this.labelText = "", this.controller, this.validator}) : super(key: key);
+  const DateField({Key? key, this.labelText = "", required this.controller, this.validator}) : super(key: key);
 
   @override
-  _DateFieldState createState() => _DateFieldState(this.labelText, this.key, this.controller, this.validator);
+  _DateFieldState createState() => _DateFieldState();
 }
 
-class _DateFieldState extends State {
-  final String labelText;
-  final Key key;
-  final DateEditingController dateController;
-  final FormFieldValidator<DateTime> validator;
-  DateTime _selectedDate;
+class _DateFieldState extends State<DateField> {
+  DateTime? _selectedDate;
   TextEditingController _controller = TextEditingController();
   DateFormat format = DateFormat.yMd();
 
-  _DateFieldState(this.labelText, this.key, this.dateController, this.validator);
-
   @override
   Widget build(BuildContext context) {
-    _selectedDate = dateController.value;
-    _controller.text = _selectedDate == null ? "" : format.format(_selectedDate);
+    _selectedDate = widget.controller.value;
+    _controller.text = _selectedDate == null ? "" : format.format(_selectedDate!);
     return TextFormField(
-      key: this.key,
-      decoration: InputDecoration(labelText: this.labelText,
+      key: widget.key,
+      decoration: InputDecoration(labelText: widget.labelText,
           suffixIcon: IconButton(
             onPressed: () {
               _selectDate(context);
@@ -38,10 +32,13 @@ class _DateFieldState extends State {
           )),
       controller: _controller,
       validator: (newValue) {
+        if(newValue == null || newValue.isEmpty) {
+          return "Please select a date";
+        }
         try {
-          dateController.value = format.parse(newValue);
-          if(this.validator != null) {
-            this.validator.call(dateController.value);
+          widget.controller.value = format.parse(newValue);
+          if(widget.validator != null) {
+            widget.validator!(widget.controller.value);
           }
         } catch (e) {
           print("Invalid Date $newValue -- ${e.toString()}");
@@ -50,18 +47,18 @@ class _DateFieldState extends State {
       },
       onEditingComplete: () {
         print("editing complete ... ${_controller.text}");
-        dateController.value = format.parse(_controller.text);
+        widget.controller.value = format.parse(_controller.text);
       },
     );
   }
 
   _selectDate(BuildContext context) async {
-    DateTime newSelectedDate = await showDatePicker(
+    DateTime? newSelectedDate = await showDatePicker(
         context: context,
-        initialDate: _selectedDate != null ? _selectedDate : DateTime.now(),
+        initialDate: _selectedDate != null ? _selectedDate! : DateTime.now(),
         firstDate: DateTime(2000),
         lastDate: DateTime(3000),
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return Theme(
               data: ThemeData.dark().copyWith(
                 colorScheme: ColorScheme.dark(
@@ -72,7 +69,7 @@ class _DateFieldState extends State {
                 ),
                 dialogBackgroundColor: Colors.blue[500],
               ),
-              child: child
+              child: child!
           );
         }
     );
@@ -80,7 +77,7 @@ class _DateFieldState extends State {
     if (newSelectedDate != null) {
       _selectedDate = newSelectedDate;
       _controller
-        ..text = format.format(_selectedDate)
+        ..text = (_selectedDate == null ? "" : format.format(_selectedDate!))
         ..selection = TextSelection.fromPosition(TextPosition(
             offset: _controller.text.length, affinity: TextAffinity.upstream));
     }
@@ -89,5 +86,5 @@ class _DateFieldState extends State {
 }
 
 class DateEditingController {
-  DateTime value;
+  DateTime? value;
 }

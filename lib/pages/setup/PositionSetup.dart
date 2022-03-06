@@ -7,7 +7,7 @@ class PositionSetup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PositionArgs args = ModalRoute.of(context).settings.arguments;
+    final PositionArgs args = ModalRoute.of(context)!.settings.arguments as PositionArgs;
     var position = args.position;
 
     return Scaffold(

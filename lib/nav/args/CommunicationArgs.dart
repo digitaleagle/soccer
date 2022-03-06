@@ -3,8 +3,8 @@ import 'package:soccer/data/CommunicationPlayer.dart';
 
 class CommunicationArgs {
   int id;
-  final Communication communication;
-  final CommunicationPlayer player;
+  final Communication? communication;
+  final CommunicationPlayer? player;
 
-  CommunicationArgs({this.id, this.communication = null, this.player = null});
+  CommunicationArgs({required this.id, this.communication = null, this.player = null});
 }

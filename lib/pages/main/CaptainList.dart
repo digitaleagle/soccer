@@ -16,12 +16,12 @@ class CaptainList extends StatefulWidget {
   _CaptainListState createState() => _CaptainListState();
 }
 
-class _CaptainListState extends State {
+class _CaptainListState extends State<CaptainList> {
   StorageService storage = locator<StorageService>();
 
   @override
   Widget build(BuildContext context) {
-    final TeamArgs args = ModalRoute.of(context).settings.arguments;
+    final TeamArgs args = ModalRoute.of(context)!.settings.arguments as TeamArgs;
 
     return Scaffold(
         appBar: AppBar(
@@ -31,9 +31,10 @@ class _CaptainListState extends State {
           future: loadTeam(args.id),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              final Team team = snapshot.data["team"];
-              final List<Game> games = snapshot.data["games"];
-              final List<ListTile>list = snapshot.data["list"];
+              CaptainListTeamObj data = snapshot.data as CaptainListTeamObj;
+              final Team team = data.team;
+              final List<Game> games = data.games;
+              final List<ListTile>list = data.list;
 
               return Container(
                   padding: EdgeInsets.all(20),
@@ -48,7 +49,7 @@ class _CaptainListState extends State {
         ));
   }
 
-  Future<dynamic> loadTeam(int id) async {
+  Future<CaptainListTeamObj> loadTeam(int id) async {
     final Team team = await storage.getTeam(id);
 
     // build list of players that we could take off
@@ -104,10 +105,19 @@ class _CaptainListState extends State {
       title: Text("Waiting for turn to be captain"),
     ));
 
-    return {
-      "team": team,
-      "games": await team.games,
-      "list": list
-    };
+    return CaptainListTeamObj(
+      team: team,
+      games: await team.games,
+      list: list
+    );
   }
+}
+
+//  this is just a quick object to let us return multiple things
+class CaptainListTeamObj {
+  Team team;
+  List<Game> games;
+  List<ListTile> list;
+
+  CaptainListTeamObj({required this.team, required this.games, required this.list});
 }

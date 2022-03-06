@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:search_widget/search_widget.dart';
+// import 'package:search_widget/search_widget.dart';
 import 'package:soccer/data/Team.dart';
 import 'package:soccer/service/StorageService.dart';
 import 'package:soccer/service/serviceLocator.dart';
@@ -13,7 +13,7 @@ class SearchForm extends StatefulWidget {
 
 class _SearchFormState extends State<SearchForm> {
   StorageService storage = locator<StorageService>();
-  List<Team> teams;
+  List<Team>? teams;
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +26,10 @@ class _SearchFormState extends State<SearchForm> {
         builder: (context, snapshot) {
           if(snapshot.hasData) {
             // Search Widget -- https://pub.dev/packages/search_widget
-            return SearchWidget<Team>(
-                dataList: teams
-            );
+            return Text("Testing");
+            //SearchWidget<Team>(
+            //    dataList: teams
+            //);
           } else {
             return CircularProgressIndicator();
           }
@@ -39,7 +40,7 @@ class _SearchFormState extends State<SearchForm> {
 
   Future<List<Team>> getSearchList() async {
         teams = await storage.listTeams();
-        return teams;
+        return teams!;
   }
   
 }

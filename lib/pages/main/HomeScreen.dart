@@ -31,11 +31,11 @@ class _HomeScreenState extends State {
         drawer: NavDrawer(),
         body: Container(
           padding: EdgeInsets.all(20),
-          child: FutureBuilder(
+          child: FutureBuilder<List<EventItem>>(
             future: loadEvents(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List<EventItem> events = snapshot.data;
+                List<EventItem> events = snapshot.data!;
                 if (events.length == 0) {
                   return ListView(
                     children: [

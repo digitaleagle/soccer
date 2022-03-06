@@ -14,59 +14,55 @@ class PlayerPracticeTile extends StatefulWidget {
   final Team team;
   final ValueNotifier<int> counter;
 
-  const PlayerPracticeTile({this.player, this.colored, this.team, this.counter});
+  const PlayerPracticeTile({required this.player, required this.colored, required this.team, required this.counter});
 
   @override
-  _PlayerPracticeTileState createState() => _PlayerPracticeTileState(player, colored, team, counter);
+  _PlayerPracticeTileState createState() => _PlayerPracticeTileState();
 }
 
-class _PlayerPracticeTileState extends State {
-  final PracticePlayer player;
-  final bool colored;
-  final Team team;
-  final ValueNotifier<int> counter;
+class _PlayerPracticeTileState extends State<PlayerPracticeTile> {
   StorageService storage = locator<StorageService>();
 
-  _PlayerPracticeTileState(this.player, this.colored, this.team, this.counter);
+  _PlayerPracticeTileState();
 
   @override
   Widget build(BuildContext context) {
     DateFormat dateFormat = DateFormat("dd/MM/yyyy");
 
     return ListTile(
-      tileColor: colored ? Colors.black12 : Colors.white,
-              leading: player.player.flag ? CircleAvatar(
+      tileColor: widget.colored ? Colors.black12 : Colors.white,
+              leading: widget.player.player.flag ? CircleAvatar(
                 child: Icon(Icons.flag),
               ) : null,
               title: Row(children: [
-                Expanded(child: Text(player.player.name)),
+                Expanded(child: Text(widget.player.player.name)),
                 Checkbox(
-                  value: player.attended,
+                  value: widget.player.attended,
                   onChanged: (value) {
                     setState(() {
-                      player.attended = value;
-                      if(value) {
-                        counter.value++;
+                      widget.player.attended = value;
+                      if(value ?? false) {
+                        widget.counter.value++;
                       } else {
-                        counter.value--;
+                        widget.counter.value--;
                       }
                     });
-                    storage.savePractice(player.practice);
+                    storage.savePractice(widget.player.practice);
                   },
                 ),
                 Checkbox(
-                  value: player.goalie,
+                  value: widget.player.goalie,
                   onChanged: (value) {
                     setState(() {
-                      player.goalie = value;
+                      widget.player.goalie = value;
                     });
-                    storage.savePractice(player.practice);
+                    storage.savePractice(widget.player.practice);
                   },
                 ),
               ]),
       onTap: () {
         Navigator.pushNamed(context, PlayerSetup.route,
-            arguments: PlayerArgs(player.player.id, team));
+            arguments: PlayerArgs(widget.player.player.id, widget.team));
       },
     );
   }

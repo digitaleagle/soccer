@@ -26,7 +26,7 @@ class _CommunicationListScreenState extends State {
           future: getCommunicationList(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<Communication> communications = snapshot.data;
+              List<Communication> communications = snapshot.data as List<Communication>;
 
               return Column(
                 children: [

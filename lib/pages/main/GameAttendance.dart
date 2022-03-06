@@ -19,13 +19,13 @@ class GameAttendance extends StatefulWidget {
   final Game game;
   final Team team;
 
-  const GameAttendance({Key key, this.game, this.team}) : super(key: key);
+  const GameAttendance({Key? key, required this.game, required this.team}) : super(key: key);
 
   @override
   _GameAttendanceSetup createState() => _GameAttendanceSetup(game, team);
 }
 
-class _GameAttendanceSetup extends State {
+class _GameAttendanceSetup extends State<GameAttendance> {
   StorageService storage = locator<StorageService>();
   final Game game;
   final Team team;

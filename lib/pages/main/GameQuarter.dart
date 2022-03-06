@@ -3,9 +3,9 @@ import 'package:soccer/data/Game.dart';
 
 class GameQuarter extends StatelessWidget {
   final Game game;
-  final VoidCallback onChanged;
+  final VoidCallback? onChanged;
 
-  const GameQuarter({Key key, this.game, this.onChanged}) : super(key: key);
+  const GameQuarter({Key? key, required this.game, this.onChanged}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,9 @@ class GameQuarter extends StatelessWidget {
           game.currentQuarter == 1 ? Colors.red : Colors.blue,
           onPressed: () {
             game.currentQuarter = 1;
-            onChanged();
+            if(onChanged != null) {
+              onChanged!();
+            }
           },
         ),
         FloatingActionButton(
@@ -27,7 +29,9 @@ class GameQuarter extends StatelessWidget {
           game.currentQuarter == 2 ? Colors.red : Colors.blue,
           onPressed: () {
             game.currentQuarter = 2;
-            onChanged();
+            if(onChanged != null) {
+              onChanged!();
+            }
           },
         ),
         FloatingActionButton(
@@ -36,7 +40,9 @@ class GameQuarter extends StatelessWidget {
           game.currentQuarter == 3 ? Colors.red : Colors.blue,
           onPressed: () {
             game.currentQuarter = 3;
-            onChanged();
+            if(onChanged != null) {
+              onChanged!();
+            }
           },
         ),
         FloatingActionButton(
@@ -45,7 +51,9 @@ class GameQuarter extends StatelessWidget {
           game.currentQuarter == 4 ? Colors.red : Colors.blue,
           onPressed: () {
             game.currentQuarter = 4;
-            onChanged();
+            if(onChanged != null) {
+              onChanged!();
+            }
           },
         ),
         Expanded(child: Container()),

@@ -21,7 +21,7 @@ class _PracticeMainState extends State {
 
   @override
   Widget build(BuildContext context) {
-    final EventArgs args = ModalRoute.of(context).settings.arguments;
+    final EventArgs args = ModalRoute.of(context)!.settings.arguments as EventArgs;
     DateFormat dateFormat = DateFormat.yMd();
 
     return Scaffold(
@@ -30,13 +30,13 @@ class _PracticeMainState extends State {
       ),
       body: Container(
         padding: EdgeInsets.all(20),
-        child: FutureBuilder(
+        child: FutureBuilder<_LoadDataObj>(
           future: loadData(args),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              Practice practice = snapshot.data["practice"];
-              Team team = snapshot.data["team"];
-              List<PracticePlayer> players = snapshot.data["players"];
+              Practice practice = snapshot.data!.practice;
+              Team team = snapshot.data!.team;
+              List<PracticePlayer> players = snapshot.data!.players;
               /* count */
               var count = 0;
               for (var player in players) {
@@ -94,15 +94,23 @@ class _PracticeMainState extends State {
     );
   }
 
-  Future<dynamic> loadData(EventArgs args) async {
+  Future<_LoadDataObj> loadData(EventArgs args) async {
     print("loading Data");
     Practice practice = await storage.getPractice(args.id);
     Team team = args.team;
     List<PracticePlayer> players = practice.loadPlayers(await team.players);
-    return {
-      "practice": practice,
-      "team": team,
-      "players": players,
-    };
+    return _LoadDataObj(
+      practice: practice,
+      team: team,
+      players: players,
+    );
   }
+}
+
+class _LoadDataObj {
+  Practice practice;
+  Team team;
+  List<PracticePlayer> players;
+
+  _LoadDataObj({required this.practice, required this.team, required this.players});
 }

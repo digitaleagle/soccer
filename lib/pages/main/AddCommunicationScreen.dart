@@ -11,11 +11,11 @@ class AddCommunicationScreen extends StatefulWidget {
   _AddCommunicationState createState() => _AddCommunicationState();
 }
 
-class _AddCommunicationState extends State {
+class _AddCommunicationState extends State<AddCommunicationScreen> {
   StorageService storage = locator<StorageService>();
   bool whatToAddSelected = false;
   bool teamsSelected = false;
-  List<TeamSelection> teams;
+  List<TeamSelection> teams = [];
   TypeSelection emailSelection = TypeSelection();
   TypeSelection primarySelection = TypeSelection();
 
@@ -63,6 +63,7 @@ class _AddCommunicationState extends State {
                           TeamSelection team = teams[index];
                           print("team building ${team.team.name} -- ${team.selected}");
                           return TeamSelector(
+                            key: widget.key,
                             title: team.team.name,
                             selection: team,
                             onChanged: (value) {
@@ -199,13 +200,13 @@ class TeamSelector extends StatefulWidget {
   final String title;
   final ValueChanged<bool> onChanged;
 
-  const TeamSelector({Key key, this.selection, this.title, this.onChanged}) : super(key: key);
+  const TeamSelector({Key? key, required this.selection, required this.title, required this.onChanged}) : super(key: key);
 
   @override
   _TeamSelectorState createState() => _TeamSelectorState(selection, title, onChanged);
 }
 
-class _TeamSelectorState extends State {
+class _TeamSelectorState extends State<TeamSelector> {
   final TeamSelection selection;
   final String title;
   final ValueChanged<bool> onChanged;
@@ -221,9 +222,9 @@ class _TeamSelectorState extends State {
       onChanged: (value) {
         setState(() {
           print("marking team ${selection.team.name} as $value  ${selection.selected}");
-          selection.selected = value;
+          selection.selected = value ?? false;
           if(onChanged != null) {
-            onChanged(value);
+            onChanged(value ?? false);
           }
         });
       },
@@ -235,31 +236,27 @@ class _TeamSelectorState extends State {
 class TypeSelector extends StatefulWidget {
   final TypeSelection selection;
   final String title;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
-  const TypeSelector({Key key, this.selection, this.title, this.onChanged}) : super(key: key);
+  const TypeSelector({Key? key, required this.selection, required this.title, this.onChanged}) : super(key: key);
 
   @override
-  _TypeSelectorState createState() => _TypeSelectorState(selection, title, onChanged);
+  _TypeSelectorState createState() => _TypeSelectorState();
 }
 
-class _TypeSelectorState extends State {
-  final TypeSelection selection;
-  final String title;
-  final ValueChanged<bool> onChanged;
-
-  _TypeSelectorState(this.selection, this.title, this.onChanged);
+class _TypeSelectorState extends State<TypeSelector> {
+  _TypeSelectorState();
 
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-      title: Text(this.title),
-      value: selection.selected,
+      title: Text(widget.title),
+      value: widget.selection.selected,
       onChanged: (value) {
         setState(() {
-          selection.selected = value;
-          if(onChanged != null) {
-            onChanged(value);
+          widget.selection.selected = value ?? false;
+          if(widget.onChanged != null) {
+            widget.onChanged!(value ?? false);
           }
         });
       },

@@ -5,4 +5,6 @@ class GamePosition {
   Player player;
   Position position;
   int quarter;
+
+  GamePosition({required this.player, required this.position, required this.quarter});
 }

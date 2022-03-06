@@ -12,15 +12,15 @@ class PlayerGeneralForm extends StatefulWidget {
   final Function(BuildContext, Player) saveFunction;
 
   const PlayerGeneralForm(
-      {Key key,
-      this.player,
-      this.nameController,
-      this.preferredNameController,
-      this.genderController,
-      this.jerseyController,
-      this.notesController,
-      this.flagReason,
-      this.saveFunction})
+      {Key? key,
+      required this.player,
+      required this.nameController,
+      required this.preferredNameController,
+      required this.genderController,
+      required this.jerseyController,
+      required this.notesController,
+      required this.flagReason,
+      required this.saveFunction})
       : super(key: key);
 
   @override
@@ -72,7 +72,7 @@ class _PlayerGeneralState extends State {
                 decoration: InputDecoration(labelText: "Name"),
                 controller: nameController,
                 validator: (newValue) {
-                  if (newValue.isEmpty) {
+                  if (newValue == null || newValue.isEmpty) {
                     return "Please enter a name";
                   }
                 },
@@ -81,14 +81,14 @@ class _PlayerGeneralState extends State {
                 decoration: InputDecoration(labelText: "Preferred Name"),
                 controller: preferredNameController,
               ),
-              DropdownButtonFormField(
+              DropdownButtonFormField<String>(
                 items: <String>[" ", "Male", "Female"]
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem(value: value, child: Text(value));
                 }).toList(),
                 value: genderController.text,
                 onChanged: (newValue) {
-                  genderController.text = newValue;
+                  genderController.text = newValue ?? "";
                 },
                 decoration: InputDecoration(labelText: "Gender"),
               ),
@@ -105,7 +105,7 @@ class _PlayerGeneralState extends State {
                         value: player.flag,
                         onChanged: (newValue) {
                           setState(() {
-                            player.flag = newValue;
+                            player.flag = newValue ?? false;
                             if(!player.flag) {
                               flagReason.text = "";
                             }

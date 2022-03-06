@@ -12,29 +12,22 @@ class GamePositionWidget extends StatefulWidget {
   final Player player;
   final int quarter;
   final Game game;
-  final Position position;
+  Position? position;
 
-  const GamePositionWidget({Key key, this.player, this.quarter, this.game, this.position}) : super(key: key);
+  GamePositionWidget({Key? key, required this.player, required this.quarter, required this.game, this.position}) : super(key: key);
 
   @override
-  _GamePositionState createState() => _GamePositionState(player, quarter, game, position);
+  _GamePositionState createState() => _GamePositionState();
 }
 
-class _GamePositionState extends State {
+class _GamePositionState extends State<GamePositionWidget> {
   StorageService storage = locator<StorageService>();
-  final Player player;
-  final int quarter;
-  final Game game;
-  Position position;
-
-  _GamePositionState(this.player, this.quarter, this.game, this.position);
 
 
   @override
   void initState() {
-    if(position == null) {
-      print("getting position ${player.id} ${player.name} Q$quarter");
-      position = game.getPosition(player, quarter);
+    if(widget.position == null) {
+      widget.position = widget.game.getPosition(widget.player, widget.quarter);
     }
   }
 
@@ -46,25 +39,25 @@ class _GamePositionState extends State {
         onPrimary: Colors.black,
       ),
       onPressed: () {
-        changeQuarter(context, quarter, player);
+        changeQuarter(context, widget.quarter, widget.player);
       },
-      child: Text(position == null ? " " : position.id),
+      child: Text(widget.position == null ? " " : widget.position!.id),
     );
   }
 
   changeQuarter(BuildContext context, int quarter, Player player) {
     Navigator.pushNamed(
         context, PositionSelector.route,
-        arguments: PositionSelectArgs(quarter, player, game)).then((obj) async {
+        arguments: PositionSelectArgs(quarter, player, widget.game)).then((obj) async {
       if(obj != null) {
         if(obj == "bench") {
-          position = null;
-          game.setPosition(player, quarter, null);
+          widget.position = null;
+          widget.game.setPosition(player, quarter, null);
         } else {
-          game.setPosition(player, quarter, obj);
-          position = obj;
+          widget.game.setPosition(player, quarter, obj as Position);
+          widget.position = obj as Position;
         }
-        storage.saveGame(game);
+        storage.saveGame(widget.game);
         setState(() {
 
         });

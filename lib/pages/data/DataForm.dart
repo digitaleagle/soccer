@@ -15,7 +15,7 @@ class DataForm extends StatefulWidget {
   _DataFormState createState() => _DataFormState();
 }
 
-class _DataFormState extends State {
+class _DataFormState extends State<DataForm> {
   final dataText = TextEditingController();
   String errorText = "";
   StorageService storage = locator<StorageService>();

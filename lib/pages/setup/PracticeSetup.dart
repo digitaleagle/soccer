@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// Breaks DateTime for some reason
+// import 'package:googleapis/content/v2_1.dart';
 import 'package:soccer/data/Practice.dart';
 import 'package:soccer/nav/args/EventArgs.dart';
 import 'package:soccer/pages/main/PracticeMain.dart';
@@ -20,12 +22,12 @@ class _PracticeSetupState extends State<PracticeSetup> {
 
   @override
   Widget build(BuildContext context) {
-    final EventArgs args = ModalRoute.of(context).settings.arguments;
+    final EventArgs args = ModalRoute.of(context)!.settings.arguments as EventArgs;
     final _formKey = GlobalKey<FormState>();
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Soccer: Practice"),
+          title: const Text("Soccer: Practice"),
           actions: [
             PopupMenuButton(
               onSelected: (value) {
@@ -33,15 +35,15 @@ class _PracticeSetupState extends State<PracticeSetup> {
                     arguments: args);
               },
                 itemBuilder: (context) {
-              return [PopupMenuItem(value: "go", child: Text("Go"))];
+              return [const PopupMenuItem(value: "go", child: Text("Go"))];
             })
           ],
         ),
-        body: FutureBuilder(
+        body: FutureBuilder<Practice>(
             future: getPractice(args.id),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                Practice practice = snapshot.data;
+                Practice practice = snapshot.data!;
                 if(practice.eventDate == null) {
                   practice.eventDate = DateTime.now();
                 }
@@ -51,7 +53,7 @@ class _PracticeSetupState extends State<PracticeSetup> {
                 return Form(
                     key: _formKey,
                     child: Container(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           children: [
                             DateField(
@@ -77,9 +79,9 @@ class _PracticeSetupState extends State<PracticeSetup> {
                                 child: ElevatedButton(
                                   child: Text("Save"),
                                   onPressed: () async {
-                                    if (_formKey.currentState.validate()) {
-                                      DateTime date = practiceDateController.value;
-                                      TimeOfDay time = practiceTimeController.value;
+                                    if (_formKey.currentState!.validate()) {
+                                      DateTime date = practiceDateController.value ?? DateTime.now();
+                                      TimeOfDay? time = practiceTimeController.value;
                                       if(time == null) {
                                         time = TimeOfDay.fromDateTime(DateTime.now());
                                       }
@@ -118,7 +120,7 @@ class _PracticeSetupState extends State<PracticeSetup> {
 
   Future<Practice> getPractice(int id) async {
     if (id <= 0) {
-      return Practice();
+      return Practice(eventDate: DateTime.now());
     }
     return await storage.getPractice(id);
   }

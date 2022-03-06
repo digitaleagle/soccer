@@ -17,24 +17,23 @@ class CommunicationMain extends StatefulWidget {
   _CommunicationMainState createState() => _CommunicationMainState();
 }
 
-class _CommunicationMainState extends State {
+class _CommunicationMainState extends State<CommunicationMain> {
   StorageService storage = locator<StorageService>();
   final _formKey = GlobalKey<FormState>();
   final descriptionController = TextEditingController();
   final smsTextController = TextEditingController();
   final emailsToSend = TextEditingController();
-  CommunicationArgs args;
-
+  late CommunicationArgs args;
   @override
   Widget build(BuildContext context) {
-    args = ModalRoute.of(context).settings.arguments;
+    args = ModalRoute.of(context)!.settings.arguments as CommunicationArgs;
 
-    return FutureBuilder(
+    return FutureBuilder<CommunicationReturnObj>(
         future: getCommunication(args.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            Communication communication = snapshot.data["communication"];
-            List<CommunicationPlayer> items = snapshot.data["items"];
+            Communication communication = snapshot.data!.communication;
+            List<CommunicationPlayer> items = snapshot.data!.items;
             descriptionController.text = communication.descr;
             smsTextController.text = communication.text;
             emailsToSend.text = buildEmailList(items);
@@ -129,8 +128,7 @@ class _CommunicationMainState extends State {
                                     onPressed: () async {
 
                                       final Telephony telephony = Telephony.instance;
-                                      bool permissionsGranted =
-                                      await telephony.requestPhoneAndSmsPermissions;
+                                      bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
 
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(SnackBar(
@@ -214,7 +212,7 @@ class _CommunicationMainState extends State {
                             arguments: CommunicationArgs(id: args.id))
                         .then((value) async {
                       if (value != null) {
-                        List<CommunicationPlayer> returnedPlayers = value;
+                        List<CommunicationPlayer> returnedPlayers = value as List<CommunicationPlayer>;
                         var items = await communication.items;
                         items.addAll(returnedPlayers);
                         save(communication);
@@ -234,7 +232,7 @@ class _CommunicationMainState extends State {
     }
 
   save(Communication communication) async {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       communication.descr =
           descriptionController.text;
       communication.text =
@@ -248,7 +246,7 @@ class _CommunicationMainState extends State {
 
   }
 
-  Future<dynamic> getCommunication(int id) async {
+  Future<CommunicationReturnObj> getCommunication(int id) async {
     Communication communication;
     if (id <= 0) {
       communication = Communication();
@@ -256,10 +254,10 @@ class _CommunicationMainState extends State {
       communication = await storage.getCommunication(id);
     }
     List<CommunicationPlayer> items = await communication.items;
-    return {
-      "communication": communication,
-      "items": items,
-    };
+    return CommunicationReturnObj(
+      communication: communication,
+      items: items,
+    );
   }
 
   String buildEmailList(List<CommunicationPlayer> items) {
@@ -277,4 +275,10 @@ class _CommunicationMainState extends State {
     return list;
   }
 
+}
+
+class CommunicationReturnObj {
+  Communication communication;
+  List<CommunicationPlayer> items;
+  CommunicationReturnObj({required this.communication, required this.items});
 }

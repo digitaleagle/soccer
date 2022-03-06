@@ -25,7 +25,7 @@ class TeamGeneralForm extends StatelessWidget {
                 decoration: InputDecoration(labelText: "Team Name"),
                 controller: nameController,
                 validator: (value) {
-                  if (value.isEmpty) {
+                  if (value == null || value.isEmpty) {
                     return "Please enter a name";
                   }
                 },
@@ -34,7 +34,7 @@ class TeamGeneralForm extends StatelessWidget {
                 decoration: InputDecoration(labelText: "Age"),
                 controller: ageController,
                 validator: (value) {
-                  if(value.isEmpty) {
+                  if(value == null || value.isEmpty) {
                     return "Please enter an age";
                   }
                 },
@@ -43,7 +43,7 @@ class TeamGeneralForm extends StatelessWidget {
                 decoration: InputDecoration(labelText: "Players on Field"),
                 controller: playersController,
                 validator: (value) {
-                  if(value.isEmpty) {
+                  if(value == null || value.isEmpty) {
                     return "Please enter the number of players";
                   }
                 },
@@ -52,7 +52,7 @@ class TeamGeneralForm extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
                   child: ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState.validate()) {
+                        if (_formKey.currentState!.validate()) {
                           team.name = nameController.value.text;
                           team.age = ageController.value.text;
                           team.playersOnField = int.parse(playersController.value.text);

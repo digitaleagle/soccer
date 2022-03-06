@@ -27,7 +27,7 @@ class _GameSetupState extends State<GameSetup> {
 
   @override
   Widget build(BuildContext context) {
-    final EventArgs args = ModalRoute.of(context).settings.arguments;
+    final EventArgs args = ModalRoute.of(context)!.settings.arguments as EventArgs;
     final _formKey = GlobalKey<FormState>();
 
     return Scaffold(
@@ -44,11 +44,11 @@ class _GameSetupState extends State<GameSetup> {
             })
           ],
         ),
-        body: FutureBuilder(
+        body: FutureBuilder<Game>(
             future: getGame(args.id),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                Game game = snapshot.data;
+                Game game = snapshot.data!;
                 gameDateController.value = game.eventDate;
                 gameTimeController.value = game.eventDate == null ? null: TimeOfDay.fromDateTime(game.eventDate);
                 fieldController.text = game.field;
@@ -96,10 +96,10 @@ class _GameSetupState extends State<GameSetup> {
                                 child: ElevatedButton(
                                   child: Text("Save"),
                                   onPressed: () async {
-                                    if (_formKey.currentState.validate()) {
-                                      DateTime date = gameDateController.value;
-                                      TimeOfDay time = gameTimeController.value;
-                                      game.eventDate = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                                    if (_formKey.currentState!.validate()) {
+                                      DateTime date = gameDateController.value ?? DateTime.now();
+                                      TimeOfDay? time = gameTimeController.value;
+                                      game.eventDate = DateTime(date.year, date.month, date.day, time == null ? 0 : time.hour, time == null ? 0 : time.minute);
                                       game.field = fieldController.text;
                                       game.opponent = opponentController.text;
                                       game.refreshments = refreshemntsController.text;
@@ -136,7 +136,7 @@ class _GameSetupState extends State<GameSetup> {
 
   Future<Game> getGame(int id) async {
     if (id <= 0) {
-      return Game();
+      return Game(eventDate: DateTime. now());
     }
     return await storage.getGame(id);
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soccer/data/Game.dart';
+import 'package:soccer/data/Team.dart';
 import 'package:soccer/nav/args/EventArgs.dart';
 import 'package:soccer/pages/main/GameAttendance.dart';
 import 'package:soccer/pages/main/GameField.dart';
@@ -21,13 +22,14 @@ class _GameMainState extends State {
 
   @override
   Widget build(BuildContext context) {
-    final EventArgs args = ModalRoute.of(context).settings.arguments;
+    final EventArgs args = ModalRoute.of(context)!.settings.arguments as EventArgs;
 
-    return FutureBuilder(
+    // TODO ... Add the <> to the rest of the future builders
+    return FutureBuilder<GameMainDataObj>(
         future: loadData(args.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            Game game = snapshot.data["game"];
+            Game game = snapshot.data!.game;
             return DefaultTabController(
               length: 5,
               child: Scaffold(
@@ -58,6 +60,7 @@ class _GameMainState extends State {
                     GameInfo(game),
                     GamePlan(game, args.team),
                     GameAttendance(
+                      team: snapshot.data!.team,
                         game: game,
                     ),
                     GameRun(game: game,),
@@ -77,10 +80,15 @@ class _GameMainState extends State {
         });
   }
 
-  dynamic loadData(int id) async {
+  Future<GameMainDataObj> loadData(int id) async {
     var game = await storage.getGame(id);
-    return {
-      "game": game,
-    };
+    var team = await storage.getTeam(game.teamId);
+    return GameMainDataObj(game: game, team: team);
   }
+}
+
+class GameMainDataObj {
+  Game game;
+  Team team;
+  GameMainDataObj({required this.game, required this.team});
 }

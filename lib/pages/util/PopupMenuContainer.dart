@@ -5,7 +5,7 @@ class PopupMenuContainer<T> extends StatefulWidget {
   final List<PopupMenuEntry<T>> items;
   final void Function(T) onItemSelected;
 
-  PopupMenuContainer({@required this.child, @required this.items, @required this.onItemSelected, Key key}) : super(key: key);
+  PopupMenuContainer({required this.child, required this.items, required this.onItemSelected, Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => PopupMenuContainerState<T>();
@@ -13,7 +13,7 @@ class PopupMenuContainer<T> extends StatefulWidget {
 
 
 class PopupMenuContainerState<T> extends State<PopupMenuContainer<T>>{
-  Offset _tapDownPosition;
+  Offset? _tapDownPosition;
 
 
   @override
@@ -23,21 +23,21 @@ class PopupMenuContainerState<T> extends State<PopupMenuContainer<T>>{
           _tapDownPosition = details.globalPosition;
         },
         onLongPress: () async {
-          final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+          final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
 
-          T value = await showMenu<T>(
+          T? value = await showMenu<T>(
             context: context,
             items: widget.items,
 
             position: RelativeRect.fromLTRB(
-              _tapDownPosition.dx,
-              _tapDownPosition.dy,
-              overlay.size.width - _tapDownPosition.dx,
-              overlay.size.height - _tapDownPosition.dy,
+              _tapDownPosition!.dx,
+              _tapDownPosition!.dy,
+              overlay.size.width - _tapDownPosition!.dx,
+              overlay.size.height - _tapDownPosition!.dy,
             ),
           );
 
-          widget.onItemSelected(value);
+          widget.onItemSelected(value!);
         },
         child: widget.child
     );

@@ -10,6 +10,8 @@ import 'package:soccer/pages/main/PositionSelector.dart';
 import 'package:soccer/service/StorageService.dart';
 import 'package:soccer/service/serviceLocator.dart';
 
+import '../../data/Position.dart';
+
 class GameField extends StatefulWidget {
   final Game game;
 
@@ -19,7 +21,7 @@ class GameField extends StatefulWidget {
   _GameFieldState createState() => _GameFieldState(game);
 }
 
-class _GameFieldState extends State {
+class _GameFieldState extends State<GameField> {
   StorageService storage = locator<StorageService>();
   final Game game;
 
@@ -33,15 +35,18 @@ class _GameFieldState extends State {
       ),
     ];
     for(var position in game.positions) {
-      Player player = null;
+      Player? player = null;
       bool duplicate = false;
-      for(var pp in game.byQuarter[game.currentQuarter]) {
+      for(var pp in game.byQuarter[game.currentQuarter]!) {
         if(pp.position.id == position.id) {
           if(player != null) {
             duplicate = true;
           }
           player = pp.player;
         }
+      }
+      if(player == null) {
+        throw Exception("No player found!");
       }
       var item = FieldPlayer(
         position: position,
@@ -50,14 +55,14 @@ class _GameFieldState extends State {
         onPressed: () {
           Navigator.pushNamed(
               context, PositionSelector.route,
-              arguments: PositionSelectArgs(game.currentQuarter, player, game)).then((obj) async {
+              arguments: PositionSelectArgs(game.currentQuarter, player!, game)).then((obj) async {
             if(obj != null) {
               if(obj == "bench") {
-                position = null;
-                game.setPosition(player, game.currentQuarter, null);
+                //  We can't change it! position = null;
+                game.setPosition(player!, game.currentQuarter, null);
               } else {
-                game.setPosition(player, game.currentQuarter, obj);
-                position = obj;
+                game.setPosition(player!, game.currentQuarter, obj as Position);
+                // We can't change it! position = obj;
               }
               storage.saveGame(game);
               setState(() {

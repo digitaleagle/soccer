@@ -7,15 +7,12 @@ import 'package:soccer/pages/main/GameQuarter.dart';
 class GameRun extends StatefulWidget {
   final Game game;
 
-  const GameRun({Key key, this.game}) : super(key: key);
+  const GameRun({Key? key, required this.game}) : super(key: key);
 
-  _GameRunState createState() => _GameRunState(game);
+  _GameRunState createState() => _GameRunState();
 }
 
-class _GameRunState extends State {
-  final Game game;
-
-  _GameRunState(this.game);
+class _GameRunState extends State<GameRun> {
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +20,7 @@ class _GameRunState extends State {
     // get the not here players
     List<Player> notHere = [];
     List<GamePlayer> here = [];
-    for(var player in game.players) {
+    for(var player in widget.game.players) {
       if(player.attended) {
         here.add(player);
       } else {
@@ -35,7 +32,7 @@ class _GameRunState extends State {
     List<Player> bench = [];
     List<Player> onField = [];
     for(var player in here) {
-      var position = game.getPosition(player.player, game.currentQuarter);
+      var position = widget.game.getPosition(player.player, widget.game.currentQuarter);
       if(position == null) {
         bench.add(player.player);
       } else {
@@ -71,7 +68,7 @@ class _GameRunState extends State {
           Expanded(
               child: Column(
                 children: [
-                  GameQuarter(game: game, onChanged: () {
+                  GameQuarter(game: widget.game, onChanged: () {
                     setState(() {});
                   },),
                   Text("Score"),

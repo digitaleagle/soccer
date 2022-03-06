@@ -7,9 +7,11 @@ import 'package:soccer/data/PracticePlayer.dart';
 
 
 class Practice extends Event {
-  int id = -1;
+  int id;
   final List<int> attendees = [];
   final List<int> goalies = [];
+
+  Practice({this.id = -1, required DateTime eventDate}) : super(id: id, eventDate: eventDate);
 
   bool get hasAttendance => (attendees.length > 0);
 
@@ -26,13 +28,16 @@ class Practice extends Event {
   static Practice fromJSON(String json) {
     try {
       Map<String, dynamic> data = jsonDecode(json);
-      Practice practice = Practice();
-      practice.id = data["id"];
+      var eventDate;
       try {
-        practice.eventDate = Event.dateFormat.parse(data["eventDate"]);
+        eventDate = Event.dateFormat.parse(data["eventDate"]);
       } catch (d) {
-        practice.eventDate = DateTime.now();
+        eventDate = DateTime.now();
       }
+      Practice practice = Practice(
+        id: data["id"],
+        eventDate: eventDate
+      );
       practice.attendees.clear();
       if(data["attendees"] != null) {
         for(int id in data["attendees"]) {

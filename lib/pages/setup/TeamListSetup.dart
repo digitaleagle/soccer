@@ -23,14 +23,14 @@ class _TeamListSetupState extends State<TeamListSetup> {
           title: Text("Soccer"),
         ),
       drawer: NavDrawer(),
-        body: FutureBuilder(
+        body: FutureBuilder<List<Team>>(
           future: getTeams(),
           builder: (context, snapshot) {
             if(snapshot.hasData) {
               return ListView.builder(
-                  itemCount: snapshot.data.length,
+                  itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    Team team = snapshot.data[index];
+                    Team team = snapshot.data![index];
                     return ListTile(
                         title: Text("#${team.id} ${team.name}"),
                       onTap: () {
@@ -43,7 +43,7 @@ class _TeamListSetupState extends State<TeamListSetup> {
                   }
               );
             }
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
         ),
       floatingActionButton: FloatingActionButton(

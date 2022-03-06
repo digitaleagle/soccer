@@ -7,7 +7,7 @@ class LoadResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final RestoreResult result = ModalRoute.of(context).settings.arguments;
+    final RestoreResult result = ModalRoute.of(context)!.settings.arguments as RestoreResult;
     final TextEditingController errorTextController = TextEditingController();
     errorTextController.text = result.errorMessage;
 

@@ -5,7 +5,7 @@ class ContactItem extends StatefulWidget {
   final String labelPrefix;
   final bool showName;
 
-  const ContactItem({this.controller, this.labelPrefix = "", this.showName = true});
+  const ContactItem({required this.controller, this.labelPrefix = "", this.showName = true});
 
   @override
   _ContactItem createState() => _ContactItem(controller, labelPrefix, showName);
@@ -50,7 +50,7 @@ class _ContactItem extends State {
             value: controller.primary,
             onChanged: (value) {
               setState(() {
-                controller.primary = value;
+                controller.primary = value ?? false;
               });
             },
           ),
@@ -64,7 +64,7 @@ class _ContactItem extends State {
             value: controller.canText,
             onChanged: (value) {
               setState(() {
-                controller.canText = value;
+                controller.canText = value ?? false;
               });
             },
           ),

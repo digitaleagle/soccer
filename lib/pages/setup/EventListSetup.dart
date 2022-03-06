@@ -31,11 +31,11 @@ class _EventListSetupState extends State {
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(20),
-        child: FutureBuilder(
+        child: FutureBuilder<List<Event>>(
           future: buildEvents(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<Event> events = snapshot.data;
+              List<Event> events = snapshot.data!;
               // https://www.geeksforgeeks.org/flutter-grouped-list/
               return GroupedListView(
                 elements: events,
@@ -46,7 +46,7 @@ class _EventListSetupState extends State {
                     return "Practice";
                   }
                 },
-                itemBuilder: (c, event) {
+                itemBuilder: (c, Event event) {
                   return ListTile(
                     title: Text(_dateFormat.format(event.eventDate)),
                     onTap: () {
@@ -59,7 +59,7 @@ class _EventListSetupState extends State {
                     },
                   );
                 },
-                groupSeparatorBuilder: (group) {
+                groupSeparatorBuilder: (String group) {
                   return Text(
                     group,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

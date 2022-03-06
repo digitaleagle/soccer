@@ -9,7 +9,7 @@ class PositionSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PositionSelectArgs args = ModalRoute.of(context).settings.arguments;
+    final PositionSelectArgs args = ModalRoute.of(context)!.settings.arguments as PositionSelectArgs;
 
     var player = args.player;
     var game = args.game;
@@ -44,7 +44,7 @@ class PositionSelector extends StatelessWidget {
                     child: ListView.builder(
                         itemCount: game.positions.length + 1,
                         itemBuilder: (context, index) {
-                          Position position;
+                          Position? position;
                           if(index == 0) {
                             position = null;
                           } else {

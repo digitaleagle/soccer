@@ -32,7 +32,7 @@ class _PlayerSetupState<PlayerSetup> extends State {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerArgs args = ModalRoute.of(context).settings.arguments;
+    final PlayerArgs args = ModalRoute.of(context)!.settings.arguments as PlayerArgs;
 
     return DefaultTabController(
         length: 3,
@@ -54,11 +54,11 @@ class _PlayerSetupState<PlayerSetup> extends State {
                       )
                     ],
                   )),
-              body: FutureBuilder(
+              body: FutureBuilder<Player>(
                 future: getPlayer(args.id),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    Player player = snapshot.data;
+                    Player player = snapshot.data!;
                     nameController.text = player.name;
                     preferredNameController.text = player.preferredName;
                     genderController.text = player.gender;
@@ -101,7 +101,7 @@ class _PlayerSetupState<PlayerSetup> extends State {
   }
 
   void saveFunction(BuildContext context, Player player) async {
-    final PlayerArgs args = ModalRoute.of(context).settings.arguments;
+    final PlayerArgs args = ModalRoute.of(context)!.settings.arguments as PlayerArgs;
     print("save function start ... ${args.parentTeam.id}");
 
     player.name = nameController.text;

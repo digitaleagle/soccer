@@ -9,15 +9,15 @@ import 'package:soccer/data/Position.dart';
 import 'Team.dart';
 
 class Game extends Event {
-  int id = -1;
-  String field;
-  String opponent;
-  String refreshments;
+  int id;
+  String field = "";
+  String opponent = "";
+  String refreshments = "";
   bool pictureDay = false;
   bool triStar = false;
-  int teamId;
+  int teamId = 0;
   final List<GamePosition> playerPositions = [];
-  List _playerPositionsToLoad;
+  List _playerPositionsToLoad = [];
   final List<GamePlayer> players = [];
   final byQuarter = {
     1: <GamePosition>[],
@@ -30,6 +30,8 @@ class Game extends Event {
   final List<int> goalies = [];
   final List<int> captains = [];
   int currentQuarter = 1;
+
+  Game({this.id = -1, required DateTime eventDate}) : super(id: id, eventDate: eventDate);
 
   bool get hasAttendance => (attendees.length > 0);
 
@@ -64,9 +66,7 @@ class Game extends Event {
   static Game fromJSON(String json) {
     try {
       Map<String, dynamic> data = jsonDecode(json);
-      Game game = Game();
-      game.id = data["id"];
-      game.eventDate = Event.dateFormat.parse(data["eventDate"]);
+      Game game = Game(id: data["id"], eventDate: Event.dateFormat.parse(data["eventDate"]));
       game.field = data["field"];
       game.opponent = data["opponent"];
       game.refreshments = data["refreshments"];
@@ -103,7 +103,7 @@ class Game extends Event {
     }
   }
 
-  void loadTeam(Team team) async {
+  Future<void> loadTeam(Team team) async {
     var teamPlayers = await team.players;
     players.clear();
     for(var player in teamPlayers) {
@@ -115,33 +115,44 @@ class Game extends Event {
     }
     if(_playerPositionsToLoad != null && _playerPositionsToLoad.length > 0) {
       playerPositions.clear();
-      byQuarter[1].clear();
-      byQuarter[2].clear();
-      byQuarter[3].clear();
-      byQuarter[4].clear();
+      byQuarter[1]!.clear();
+      byQuarter[2]!.clear();
+      byQuarter[3]!.clear();
+      byQuarter[4]!.clear();
       while(_playerPositionsToLoad.length > 0) {
         var p = _playerPositionsToLoad.removeLast();
-        var player = GamePosition();
+        Player? foundPlayer;
+        Position? foundPosition;
         for(var p2 in teamPlayers) {
           if(p2.id == p["player"]) {
-            player.player = p2;
+            foundPlayer = p2;
           }
         }
         for(var position in positions) {
           if(position.id == p["position"]) {
-            player.position = position;
+            foundPosition = position;
           }
         }
-        player.quarter = p["quarter"];
+        if(foundPlayer == null) {
+          throw Exception("No player found for ${p['player']}");
+        }
+        if(foundPosition == null) {
+          throw Exception("No position found for ${p['position']}");
+        }
+        var player = GamePosition(
+            player: foundPlayer,
+          position: foundPosition,
+          quarter: p["quarter"],
+        );
         playerPositions.add(player);
-        byQuarter[player.quarter].add(player);
+        byQuarter[player.quarter]!.add(player);
       }
     }
   }
 
-  void setPosition(Player player, int quarter, Position position) {
+  void setPosition(Player player, int quarter, Position? position) {
     bool found = false;
-    GamePosition gamePlayer = null;
+    GamePosition? gamePlayer = null;
     for(var p in playerPositions) {
       if(p.player.id == player.id && p.quarter == quarter) {
         found = true;
@@ -155,21 +166,22 @@ class Game extends Event {
     }
     if(position != null) {
       if (found) {
-        gamePlayer.position = position;
+        gamePlayer!.position = position;
       } else {
-        gamePlayer = GamePosition();
-        gamePlayer.player = player;
-        gamePlayer.position = position;
-        gamePlayer.quarter = quarter;
+        gamePlayer = GamePosition(
+          player: player,
+          position: position,
+          quarter: quarter
+        );
         playerPositions.add(gamePlayer);
       }
     }
     found = false;
-    for(var p in byQuarter[quarter]) {
+    for(var p in byQuarter[quarter]!) {
       if(p.player.id == player.id && p.quarter == quarter) {
         found = true;
         if(position == null) {
-          byQuarter[quarter].remove(p);
+          byQuarter[quarter]!.remove(p);
         } else {
           gamePlayer = p;
         }
@@ -178,17 +190,18 @@ class Game extends Event {
     }
     if(!found && position != null) {
       if(gamePlayer == null) {
-        gamePlayer = GamePosition();
-        gamePlayer.player = player;
-        gamePlayer.position = position;
-        gamePlayer.quarter = quarter;
+        gamePlayer = GamePosition(
+          player: player,
+          position: position,
+          quarter: quarter,
+        );
       }
-      byQuarter[quarter].add(gamePlayer);
+      byQuarter[quarter]!.add(gamePlayer);
     }
   }
 
-  Position getPosition(Player player, int quarter) {
-    for(var playerPosition in byQuarter[quarter]) {
+  Position? getPosition(Player player, int quarter) {
+    for(var playerPosition in byQuarter[quarter]!) {
       if(playerPosition.player.id == player.id) {
         return playerPosition.position;
       }

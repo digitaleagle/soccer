@@ -3,11 +3,11 @@ import 'package:soccer/data/CommunicationItem.dart';
 import 'Player.dart';
 
 class CommunicationPlayer {
-  Player _player;
-  int player_id;
+  Player? _player;
+  int? player_id;
   bool complete = false;
 
-  Player get player => _player;
+  Player get player => _player ?? Player();
 
   set player(Player value) {
     _player = value;

@@ -1,7 +1,7 @@
 import 'Player.dart';
 
 class CommunicationItem {
-  Player player;
+  Player? player;
   bool isEmail = false;
   bool isText = false;
   bool isCall = false;
@@ -9,5 +9,5 @@ class CommunicationItem {
   bool complete = false;
   bool leftMessage = false;
   bool noAnswer = false;
-  String address;
+  String address = "";
 }

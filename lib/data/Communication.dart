@@ -24,7 +24,7 @@ class Communication {
     StorageService storage = locator<StorageService>();
 
     for(var player in _items) {
-      player.player = await storage.getPlayer(player.player_id);
+      player.player = await storage.getPlayer(player.player_id!);
       for(var item in player.items) {
         item.player = player.player;
       }

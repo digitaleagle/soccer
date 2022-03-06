@@ -18,11 +18,11 @@ class TeamSetup extends StatefulWidget {
 
 class _TeamSetupState extends State<TeamSetup> {
   StorageService storage = locator<StorageService>();
-  List<Player> _players;
+  late List<Player> _players;
 
   @override
   Widget build(BuildContext context) {
-    final TeamArgs args = ModalRoute.of(context).settings.arguments;
+    final TeamArgs args = ModalRoute.of(context)!.settings.arguments as TeamArgs;
 
     var title = "Soccer: Team ${args.id}";
     if (args.id <= 0) {
@@ -47,12 +47,12 @@ class _TeamSetupState extends State<TeamSetup> {
                 ]
             ),
           ),
-          body: FutureBuilder(
+          body: FutureBuilder<Team>(
               future: getTeam(args.id),
               builder: (context, snapshot) {
                 Team team;
                 if (snapshot.hasData) {
-                  team = snapshot.data;
+                  team = snapshot.data!;
                   nameController.text = team.name;
                   ageController.text = team.age;
                   playersController.text = team.playersOnField.toString();

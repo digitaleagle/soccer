@@ -8,7 +8,7 @@ class FieldPlayer extends StatelessWidget {
   final VoidCallback onPressed;
   final bool duplicate;
 
-  const FieldPlayer({Key key, this.position, this.player, this.onPressed, this.duplicate}) : super(key: key);
+  const FieldPlayer({Key? key, required this.position, required this.player, required this.onPressed, required this.duplicate}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
