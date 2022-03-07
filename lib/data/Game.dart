@@ -67,6 +67,7 @@ class Game extends Event {
     try {
       Map<String, dynamic> data = jsonDecode(json);
       Game game = Game(id: data["id"], eventDate: Event.dateFormat.parse(data["eventDate"]));
+      game.teamId = data["teamId"];
       game.field = data["field"];
       game.opponent = data["opponent"];
       game.refreshments = data["refreshments"];
