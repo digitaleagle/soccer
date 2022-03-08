@@ -47,9 +47,9 @@ class StorageServiceImpl extends StorageService {
   @override
   Future<List<Team>> listTeams() async {
     List<Team> teams = [];
-    TeamList teamList = await this.getTeamList();
+    TeamList teamList = await getTeamList();
     for (int id in teamList.idList) {
-      Team team = await this.getTeam(id);
+      Team team = await getTeam(id);
       teams.add(team);
     }
     return teams;
@@ -62,6 +62,20 @@ class StorageServiceImpl extends StorageService {
       return TeamList();
     }
     return TeamList.fromJSON(json);
+  }
+
+  @override
+  Future<Team> findPlayersTeam(Player player) async {
+    TeamList teams = await getTeamList();
+    for(int teamID in teams.idList) {
+      Team team = await getTeam(teamID);
+      for(Player p in await team.players) {
+        if(p.id == player.id) {
+          return team;
+        }
+      }
+    }
+    throw Exception("Team not found for player ${player.id} ${player.name}");
   }
 
   Future<void> saveTeamList(TeamList teamList) async {
@@ -122,7 +136,7 @@ class StorageServiceImpl extends StorageService {
     Game game = Game.fromJSON(json);
 
     /* Look up the team Id */
-    if(game.teamId == null) {
+    // if(game.teamId == null) {
       var teamList = await this.getTeamList();
       for(var teamId in teamList.idList) {
         String? json = prefs.getString("Team$teamId");
@@ -140,15 +154,15 @@ class StorageServiceImpl extends StorageService {
           }
         }
       }
-    }
-    if(game.teamId == null) {
-      print("Game doesn't have a team: $id");
-      print(StackTrace.current);
-      throw Exception("Game doesn't have a team: $id");
-    }
+    //}
+    // if(game.teamId == null) {
+    //   print("Game doesn't have a team: $id");
+    //   print(StackTrace.current);
+    //   throw Exception("Game doesn't have a team: $id");
+    // }
 
     try {
-      game.loadTeam(await this.getTeam(game.teamId));
+      game.loadTeam(await getTeam(game.teamId));
     } catch (e, trace) {
       print("Print this shouldn't happen, but we can't load the team (${game.teamId}) for game #$id");
       print(e.toString());
@@ -216,14 +230,15 @@ class StorageServiceImpl extends StorageService {
     }
     return Communication.fromJSON(json);
   }
+  @override
   Future<void> saveCommunication(Communication communication) async {
     final prefs = await SharedPreferences.getInstance();
 
     if(communication.id <= 0) {
-      CommunicationList communicationList = await this.getCommunicationList();
+      CommunicationList communicationList = await getCommunicationList();
       communication.id = communicationList.nextId++;
       communicationList.idList.add(communication.id);
-      this.saveCommunicationList(communicationList);
+      saveCommunicationList(communicationList);
     }
 
     prefs.setString("Comm${communication.id}", communication.toJSON());
@@ -242,33 +257,36 @@ class StorageServiceImpl extends StorageService {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("CommList", communicationList.toJSON());
   }
+  @override
   Future<List<Communication>> listCommunications() async {
-    CommunicationList list = await this.getCommunicationList();
+    CommunicationList list = await getCommunicationList();
     List<Communication> returnList = [];
     for(int id in list.idList) {
-      returnList.add(await this.getCommunication(id));
+      returnList.add(await getCommunication(id));
     }
     return returnList;
   }
+  @override
   Future<void> deleteCommunication(Communication communication) async {
-    CommunicationList list = await this.getCommunicationList();
+    CommunicationList list = await getCommunicationList();
     list.idList.remove(communication.id);
-    this.saveCommunicationList(list);
+    saveCommunicationList(list);
     final prefs = await SharedPreferences.getInstance();
     prefs.remove("Comm${communication.id}");
   }
 
 
 
+  @override
   Future<String> backup() async {
     List<String> outTeams = [];
     List<String> outPlayers = [];
     List<String> outGames = [];
     List<String> outPractices = [];
     List<String> outCommunications = [];
-    var teams = await this.getTeamList();
+    var teams = await getTeamList();
     for (var id in teams.idList) {
-      var team = await this.getTeam(id);
+      var team = await getTeam(id);
       outTeams.add(team.toJSON());
       for (var player in await team.players) {
         outPlayers.add(player.toJSON());
@@ -281,7 +299,7 @@ class StorageServiceImpl extends StorageService {
         outPractices.add(practice.toJSON());
       }
     }
-    for(var communiciation in await this.listCommunications()) {
+    for(var communiciation in await listCommunications()) {
       outCommunications.add(communiciation.toJSON());
     }
     var obj = {
@@ -294,17 +312,18 @@ class StorageServiceImpl extends StorageService {
     return jsonEncode(obj);
   }
 
+  @override
   Future<RestoreResult> restore(String json) async {
     var result = RestoreResult();
     try {
-      var teamMap = Map<int, dynamic>();
+      var teamMap = <int, dynamic>{};
 
       var obj = jsonDecode(json);
       List teams = obj["teams"];
       TeamList teamList = TeamList();
       for (var strTeam in teams) {
         Team team = Team.fromJSON(strTeam);
-        this.saveTeam(team);
+        saveTeam(team);
         teamList.idList.add(team.id);
         result.teamsLoaded++;
 
@@ -312,12 +331,12 @@ class StorageServiceImpl extends StorageService {
           teamMap[gameId] = team;
         }
       }
-      this.saveTeamList(teamList);
+      saveTeamList(teamList);
 
       List players = obj["players"];
       for (var strPlayer in players) {
         Player player = Player.fromJSON(strPlayer);
-        this.savePlayer(player);
+        savePlayer(player);
         result.playersLoaded++;
       }
 
@@ -325,14 +344,14 @@ class StorageServiceImpl extends StorageService {
       for (var strGame in games) {
         Game game = Game.fromJSON(strGame);
         await game.loadTeam(teamMap[game.id]);
-        this.saveGame(game);
+        saveGame(game);
         result.gamesLoaded++;
       }
 
       List practices = obj["practices"];
       for (var strPractice in practices) {
         Practice practice = Practice.fromJSON(strPractice);
-        this.savePractice(practice);
+        savePractice(practice);
         result.practicesLoaded++;
       }
 
@@ -341,13 +360,13 @@ class StorageServiceImpl extends StorageService {
         for(String strCommunication in obj["communications"]) {
           var communication = Communication.fromJSON(strCommunication);
           commList.idList.add(communication.id);
-          this.saveCommunication(communication);
+          saveCommunication(communication);
           if(commList.nextId <= communication.id) {
             commList.nextId = communication.id + 1;
           }
           result.communicationsLoaded++;
         }
-        this.saveCommunicationList(commList);
+        saveCommunicationList(commList);
       }
     } catch (e) {
       result.success = false;
@@ -357,28 +376,29 @@ class StorageServiceImpl extends StorageService {
 
   }
 
+  @override
   Future<RestoreResult> restoreUpdate(String json) async {
     var result = RestoreResult();
     try {
-      var gameMap = Map<int, Team>();
-      var playerMap = Map<int, Team>();
-      var practiceMap = Map<int, Team>();
+      var gameMap = <int, Team>{};
+      var playerMap = <int, Team>{};
+      var practiceMap = <int, Team>{};
 
       var obj = jsonDecode(json);
       List teams = obj["teams"];
       for (var strTeam in teams) {
         Team team = Team.fromJSON(strTeam);
         var shouldLoad = false;
-        Team? existing = null;
+        Team? existing;
         try {
-          existing = await this.getTeam(team.id);
+          existing = await getTeam(team.id);
         } catch(e) {
           shouldLoad = true;
           team.id = -1;
         }
         var fileTeam = team;
         if(shouldLoad) {
-          this.saveTeam(team);
+          saveTeam(team);
         } else {
           if(existing != null) {
             team = existing;
@@ -398,7 +418,7 @@ class StorageServiceImpl extends StorageService {
         team.playerIds.clear();
         team.gameIds.clear();
         team.practiceIds.clear();
-        this.saveTeam(team);
+        saveTeam(team);
       }
 
       List players = obj["players"];
@@ -406,7 +426,7 @@ class StorageServiceImpl extends StorageService {
         Player player = Player.fromJSON(strPlayer);
         var shouldLoad = false;
         try {
-          var existing = await this.getPlayer(player.id);
+          var existing = await getPlayer(player.id);
           if(player.hasPreferences && !existing.hasPreferences) {
             shouldLoad = true;
           }
@@ -419,7 +439,7 @@ class StorageServiceImpl extends StorageService {
         }
         var isDuplicate = false;
         for(var existingId in team.playerIds) {
-          var existing = await this.getPlayer(existingId);
+          var existing = await getPlayer(existingId);
           if(existing.name == player.name) {
             // this is a duplicate
             shouldLoad = false;
@@ -427,13 +447,13 @@ class StorageServiceImpl extends StorageService {
           }
         }
         if(shouldLoad) {
-          this.savePlayer(player);
+          savePlayer(player);
           result.playersLoaded++;
         }
         if(!isDuplicate) {
           // add back to the team
           team.playerIds.add(player.id);
-          this.saveTeam(team);
+          saveTeam(team);
         }
       }
 
@@ -447,11 +467,11 @@ class StorageServiceImpl extends StorageService {
           throw Exception("Failed to get to game map for ${game.id}");
         }
         team.gameIds.add(game.id);
-        this.saveTeam(team);
+        saveTeam(team);
 
         var shouldLoad = false;
         try {
-          var existing = await this.getGame(game.id);
+          var existing = await getGame(game.id);
           if(!existing.hasAttendance && game.hasAttendance) {
             shouldLoad = true;
           }
@@ -460,7 +480,7 @@ class StorageServiceImpl extends StorageService {
         }
         if(shouldLoad) {
           await game.loadTeam(gameMap[game.id]!);
-          this.saveGame(game);
+          saveGame(game);
           result.gamesLoaded++;
         }
       }
@@ -470,7 +490,7 @@ class StorageServiceImpl extends StorageService {
         Practice practice = Practice.fromJSON(strPractice);
         var shouldLoad = false;
         try {
-          var existing = await this.getPractice(practice.id);
+          var existing = await getPractice(practice.id);
           if(!existing.hasAttendance && practice.hasAttendance) {
             shouldLoad = true;
           }
@@ -478,7 +498,7 @@ class StorageServiceImpl extends StorageService {
           shouldLoad = true;
         }
         if(shouldLoad) {
-          this.savePractice(practice);
+          savePractice(practice);
           result.practicesLoaded++;
         }
         // add back to the team
@@ -487,7 +507,7 @@ class StorageServiceImpl extends StorageService {
           throw Exception("Failed to find Team for ${practice.id}");
         }
         team.practiceIds.add(practice.id);
-        this.saveTeam(team);
+        saveTeam(team);
       }
 
       if(obj["communications"] != null) {
@@ -495,7 +515,7 @@ class StorageServiceImpl extends StorageService {
           var communication = Communication.fromJSON(strCommunication);
           var shouldLoad = false;
           try {
-            var existing = await this.getCommunication(communication.id);
+            var existing = await getCommunication(communication.id);
             if(existing.descr != communication.descr) {
               shouldLoad = true;
             }
@@ -503,7 +523,7 @@ class StorageServiceImpl extends StorageService {
               shouldLoad = true;
             }
             if(shouldLoad) {
-              var list = await this.listCommunications();
+              var list = await listCommunications();
               for(var search in list) {
                 if(search.descr == communication.descr && search.text == communication.text) {
                   shouldLoad = false;
@@ -516,7 +536,7 @@ class StorageServiceImpl extends StorageService {
           }
           if(shouldLoad) {
             communication.id = -1;
-            this.saveCommunication(communication);
+            saveCommunication(communication);
             result.communicationsLoaded++;
           }
         }
@@ -547,6 +567,7 @@ class StorageServiceImpl extends StorageService {
     }
   }
 
+  @override
   Future<void> googleSignIn() async {
     // https://medium.com/flutter-community/flutter-sign-in-with-google-in-android-without-firebase-a91b977d166f
     var   _googleSignIn  =  GoogleSignIn();

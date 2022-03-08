@@ -16,6 +16,8 @@ abstract class StorageService {
 
   Future<void> savePlayer(Player player);
 
+  Future<Team> findPlayersTeam(Player player);
+
   Future<Game> getGame(int id);
 
   Future<void> saveGame(Game game);

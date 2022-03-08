@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:soccer/data/CommunicationItem.dart';
+import 'package:soccer/data/Team.dart';
 import 'package:soccer/nav/args/CommunicationArgs.dart';
+import 'package:soccer/nav/args/PlayerArgs.dart';
+import 'package:soccer/pages/setup/PlayerSetup.dart';
 import 'package:soccer/service/StorageService.dart';
 import 'package:soccer/service/serviceLocator.dart';
 import 'package:telephony/telephony.dart';
@@ -86,6 +89,19 @@ class _CommunicationItemState extends State {
                         semanticLabel: "Soccer Player Name",
                       ),
                       Text("Name: ${player.player.name}"),
+                      IconButton(
+                        icon: const Icon(Icons.open_in_new),
+                        tooltip: "Add to contacted items",
+                        onPressed: () async {
+                          Team team = await storage.findPlayersTeam(player.player);
+                          Navigator.pushNamed(context, PlayerSetup.route,
+                              arguments: PlayerArgs(player.player.id, team)).then((value) {
+                                setState(() {
+
+                                });
+                          });
+                        },
+                      ),
                     ],
                   ),
                   Row(

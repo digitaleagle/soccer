@@ -105,7 +105,6 @@ class Communication {
       }
       return communication;
     } catch (e) {
-      print("Error loading Communication $e");
       throw Exception("Error loading communication");
     }
   }
