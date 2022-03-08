@@ -47,6 +47,7 @@ class Communication {
           "complete": item.complete,
           "leftMessage": item.leftMessage,
           "noAnswer": item.noAnswer,
+          "note": item.note,
         };
         itemList.add(item_obj);
       }
@@ -95,7 +96,8 @@ class Communication {
             item.sent = i["sent"] == true;
             item.complete = i["complete"] == true;
             item.leftMessage = i["leftMessage"] == true;
-            item.noAnswer = i["noAnswe"] == true;
+            item.noAnswer = i["noAnswer"] == true;
+            item.note = i["note"] ?? "";
             player.items.add(item);
           }
           communication._items.add(player);
