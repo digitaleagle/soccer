@@ -5,6 +5,8 @@ import 'package:soccer/data/Team.dart';
 import 'package:soccer/nav/args/PositionArgs.dart';
 import 'package:soccer/pages/setup/PositionSetup.dart';
 import 'package:soccer/pages/setup/position_template_setup.dart';
+import 'package:soccer/service/StorageService.dart';
+import 'package:soccer/service/serviceLocator.dart';
 
 class TeamPositionSetup extends StatefulWidget {
   final Team team;
@@ -16,6 +18,8 @@ class TeamPositionSetup extends StatefulWidget {
 }
 
 class _TeamPositionSetupState extends State<TeamPositionSetup> {
+  final StorageService storage = locator<StorageService>();
+
   _TeamPositionSetupState();
 
   @override
@@ -61,6 +65,7 @@ class _TeamPositionSetupState extends State<TeamPositionSetup> {
                       if(positions != null) {
                         widget.team.positions.clear();
                         widget.team.positions.addAll(positions as List<Position>);
+                        storage.saveTeam(widget.team);
                         setState(() {
                         });
                       }
@@ -77,6 +82,7 @@ class _TeamPositionSetupState extends State<TeamPositionSetup> {
                   setState(() {
                     if(newPosition.id.isNotEmpty || newPosition.name.isNotEmpty) {
                       widget.team.positions.add(newPosition);
+                      storage.saveTeam(widget.team);
                     }
                   });
                 });
