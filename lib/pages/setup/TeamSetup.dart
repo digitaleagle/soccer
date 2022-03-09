@@ -12,6 +12,8 @@ import 'PlayerListSetup.dart';
 
 class TeamSetup extends StatefulWidget {
   static const route = '/setup/team';
+
+  const TeamSetup({Key? key}) : super(key: key);
   @override
   _TeamSetupState createState() => _TeamSetupState();
 }
@@ -38,7 +40,7 @@ class _TeamSetupState extends State<TeamSetup> {
         child: Scaffold(
           appBar: AppBar(
             title: Text(title),
-            bottom: TabBar(
+            bottom: const TabBar(
                 tabs: [
                   Tab(icon: Icon(Icons.settings)),
                   Tab(icon: Icon(Icons.supervisor_account)),
@@ -61,10 +63,10 @@ class _TeamSetupState extends State<TeamSetup> {
                         team, nameController, ageController, playersController),
                     PlayerListSetup(team, _players),
                     EventListSetup(team),
-                    TeamPositionSetup(team),
+                    TeamPositionSetup(team: team,),
                   ]);
                 } else {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
               }),
         ));

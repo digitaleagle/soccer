@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:soccer/data/Position.dart';
 import 'package:soccer/data/Team.dart';
 import 'package:soccer/nav/args/PositionArgs.dart';
 import 'package:soccer/pages/setup/PositionSetup.dart';
+import 'package:soccer/pages/setup/position_template_setup.dart';
 
 class TeamPositionSetup extends StatefulWidget {
   final Team team;
 
-  const TeamPositionSetup(this.team);
+  const TeamPositionSetup({Key? key, required this.team}) : super(key: key);
 
-  _TeamPositionSetupState createState() => _TeamPositionSetupState(team);
+  @override
+  _TeamPositionSetupState createState() => _TeamPositionSetupState();
 }
 
-class _TeamPositionSetupState extends State {
-  final Team team;
-
-  _TeamPositionSetupState(this.team);
+class _TeamPositionSetupState extends State<TeamPositionSetup> {
+  _TeamPositionSetupState();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: ListView.builder(
-          itemCount: team.positions.length,
+          itemCount: widget.team.positions.length,
           itemBuilder: (context, index) {
-            var position = team.positions[index];
+            var position = widget.team.positions[index];
             return ListTile(
               leading: CircleAvatar(
                 child: Text(position.id),
@@ -44,24 +45,47 @@ class _TeamPositionSetupState extends State {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          var newPosition = Position();
-          Navigator.pushNamed(context, PositionSetup.route,
-                  arguments: PositionArgs(newPosition))
-              .then((obj) {
-            setState(() {
-              if(!newPosition.id.isEmpty || !newPosition.name.isEmpty) {
-                team.positions.add(newPosition);
-              }
-            });
-          });
-        },
+      floatingActionButton: SpeedDial(
+        heroTag: "addPositions",
+        tooltip: "Add Position(s)",
+        icon: Icons.add,
+        children: [
+          SpeedDialChild(
+              child: const Icon(Icons.group_add),
+              label: "Template",
+              onTap: () {
+                var newPosition = Position();
+                Navigator.pushNamed(context, PositionTemplateSetup.route,
+                    arguments: PositionArgs(newPosition))
+                    .then((positions) {
+                      if(positions != null) {
+                        widget.team.positions.clear();
+                        widget.team.positions.addAll(positions as List<Position>);
+                        setState(() {
+                        });
+                      }
+                });
+              }),
+          SpeedDialChild(
+              child: const Icon(Icons.person_add),
+              label: "Single Position",
+              onTap: () {
+                var newPosition = Position();
+                Navigator.pushNamed(context, PositionSetup.route,
+                    arguments: PositionArgs(newPosition))
+                    .then((obj) {
+                  setState(() {
+                    if(newPosition.id.isNotEmpty || newPosition.name.isNotEmpty) {
+                      widget.team.positions.add(newPosition);
+                    }
+                  });
+                });
+              }),
+        ],
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(5),
-        child: Text("${team.positions.length} positions", style: TextStyle(color: Colors.white),),
+        padding: const EdgeInsets.all(5),
+        child: Text("${widget.team.positions.length} positions", style: const TextStyle(color: Colors.white),),
         color: Colors.blue,
       ),
     );

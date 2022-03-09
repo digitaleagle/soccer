@@ -17,6 +17,7 @@ import 'package:soccer/pages/setup/PlayerSetup.dart';
 import 'package:soccer/pages/setup/PositionSetup.dart';
 import 'package:soccer/pages/setup/PracticeSetup.dart';
 import 'package:soccer/pages/setup/TeamSetup.dart';
+import 'package:soccer/pages/setup/position_template_setup.dart';
 import 'package:soccer/service/serviceLocator.dart';
 
 import 'pages/setup/TeamListSetup.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
         TeamListSetup.route: (context) => TeamListSetup(),
         TeamSetup.route: (context) => TeamSetup(),
         PositionSetup.route: (context) => PositionSetup(),
+        PositionTemplateSetup.route: (context) => PositionTemplateSetup(),
         PlayerSetup.route: (context) => PlayerSetup(),
         PracticeSetup.route: (context) => PracticeSetup(),
         GameSetup.route: (context) => GameSetup(),

@@ -13,6 +13,8 @@ import 'package:soccer/service/serviceLocator.dart';
 class GameMain extends StatefulWidget {
   static const route = "/game";
 
+  const GameMain({Key? key}) : super(key: key);
+
   @override
   _GameMainState createState() => _GameMainState();
 }
@@ -35,7 +37,7 @@ class _GameMainState extends State {
               child: Scaffold(
                 appBar: AppBar(
                   title: Text("Soccer: ${args.team.name} v. ${game.opponent}"),
-                  bottom: TabBar(
+                  bottom: const TabBar(
                     tabs: [
                       Tab(
                         icon: Icon(Icons.info_outline),
@@ -64,7 +66,7 @@ class _GameMainState extends State {
                         game: game,
                     ),
                     GameRun(game: game,),
-                    GameField(game),
+                    GameField(game: game,),
                   ],
                 ),
               ),
@@ -72,9 +74,9 @@ class _GameMainState extends State {
           } else {
             return Scaffold(
               appBar: AppBar(
-                title: Text("Soccer: Loading Game"),
+                title: const Text("Soccer: Loading Game"),
               ),
-              body: CircularProgressIndicator(),
+              body: const CircularProgressIndicator(),
             );
           }
         });
