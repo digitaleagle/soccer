@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
 set(BINARY_NAME "soccer")
-set(APPLICATION_ID "com.example.soccer")
+set(APPLICATION_ID "net.digitaleagle.soccer")
 
 cmake_policy(SET CMP0063 NEW)
 
