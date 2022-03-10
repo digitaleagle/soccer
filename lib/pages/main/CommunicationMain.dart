@@ -122,50 +122,87 @@ class _CommunicationMainState extends State<CommunicationMain> {
                                     },
                                     child: Text("Mark emails sent")),
                               ),
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                child: ElevatedButton(
-                                    onPressed: () async {
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: ElevatedButton(
+                                        onPressed: () async {
 
-                                      final Telephony telephony = Telephony.instance;
-                                      bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+                                          final Telephony telephony = Telephony.instance;
+                                          bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
 
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                          content: Text("Sending texts to everyone ...")));
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                              content: Text("Sending texts to everyone ...")));
 
-                                      var items = await communication.items;
-                                      for(var playerItem in items) {
-                                        for(var item in playerItem.items) {
-                                          if(item.isText) {
-                                            if(communication.text.length > 160) {
-                                              telephony.sendSms(
-                                                to: item.address,
-                                                message: communication.text,
-                                                isMultipart: true,
-                                              );
-                                            } else {
-                                              telephony.sendSms(
-                                                  to: item.address,
-                                                  message: communication.text);
+                                          var items = await communication.items;
+                                          for(var playerItem in items) {
+                                            for(var item in playerItem.items) {
+                                              if(item.isText) {
+                                                if(communication.text.length > 160) {
+                                                  telephony.sendSms(
+                                                    to: item.address,
+                                                    message: communication.text,
+                                                    isMultipart: true,
+                                                  );
+                                                } else {
+                                                  telephony.sendSms(
+                                                      to: item.address,
+                                                      message: communication.text);
+                                                }
+                                              }
+                                              item.sent = true;
                                             }
                                           }
-                                          item.sent = true;
-                                        }
-                                      }
 
-                                      save(communication);
+                                          save(communication);
 
-                                      ScaffoldMessenger.of(context)
-                                          .hideCurrentSnackBar();
-                                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                          SnackBar(content: Text("Sent")));
+                                          ScaffoldMessenger.of(context)
+                                              .hideCurrentSnackBar();
+                                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                              SnackBar(content: Text("Sent")));
 
-                                    },
-                                    child:
-                                        Text("Send all texts")),
+                                        },
+                                        child:
+                                            Text("Send all texts")),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: ElevatedButton(
+                                        onPressed: () async {
+
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                              content: Text("Reseting ...")));
+
+                                          var items = await communication.items;
+                                          for(var playerItem in items) {
+                                            for(var item in playerItem.items) {
+                                              if(item.isText) {
+                                                item.sent = false;
+                                              }
+                                            }
+                                          }
+
+                                          save(communication);
+
+                                          ScaffoldMessenger.of(context)
+                                              .hideCurrentSnackBar();
+                                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                              SnackBar(content: Text("Updated / Saved")));
+
+                                        },
+                                        child:
+                                        Text("Reset to resend")),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
