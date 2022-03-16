@@ -24,42 +24,16 @@ class PlayerGeneralForm extends StatefulWidget {
       : super(key: key);
 
   @override
-  _PlayerGeneralState createState() => _PlayerGeneralState(
-      player,
-      nameController,
-      preferredNameController,
-      genderController,
-      jerseyController,
-      notesController,
-      flagReason,
-      saveFunction);
+  _PlayerGeneralState createState() => _PlayerGeneralState();
 }
 
-class _PlayerGeneralState extends State {
-  final Player player;
-  final TextEditingController nameController;
-  final TextEditingController preferredNameController;
-  final TextEditingController genderController;
-  final TextEditingController jerseyController;
-  final TextEditingController notesController;
-  final TextEditingController flagReason;
-  final Function(BuildContext, Player) saveFunction;
+class _PlayerGeneralState extends State<PlayerGeneralForm> {
   final _formKey = GlobalKey<FormState>();
-
-  _PlayerGeneralState(
-      this.player,
-      this.nameController,
-      this.preferredNameController,
-      this.genderController,
-      this.jerseyController,
-      this.notesController,
-      this.flagReason,
-      this.saveFunction);
 
   @override
   Widget build(BuildContext context) {
-    if (genderController.text.isEmpty) {
-      genderController.text = " ";
+    if (widget.genderController.text.isEmpty) {
+      widget.genderController.text = " ";
     }
     return Form(
       key: _formKey,
@@ -70,7 +44,7 @@ class _PlayerGeneralState extends State {
             children: [
               TextFormField(
                 decoration: InputDecoration(labelText: "Name"),
-                controller: nameController,
+                controller: widget.nameController,
                 validator: (newValue) {
                   if (newValue == null || newValue.isEmpty) {
                     return "Please enter a name";
@@ -79,22 +53,22 @@ class _PlayerGeneralState extends State {
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: "Preferred Name"),
-                controller: preferredNameController,
+                controller: widget.preferredNameController,
               ),
               DropdownButtonFormField<String>(
                 items: <String>[" ", "Male", "Female"]
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem(value: value, child: Text(value));
                 }).toList(),
-                value: genderController.text,
+                value: widget.genderController.text,
                 onChanged: (newValue) {
-                  genderController.text = newValue ?? "";
+                  widget.genderController.text = newValue ?? "";
                 },
                 decoration: InputDecoration(labelText: "Gender"),
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: "Jersey"),
-                controller: jerseyController,
+                controller: widget.jerseyController,
               ),
               Row(children: [
                 Flexible(
@@ -102,25 +76,25 @@ class _PlayerGeneralState extends State {
                   child: Container(
                     child: CheckboxListTile(
                         title: Text("Flag"),
-                        value: player.flag,
+                        value: widget.player.flag,
                         onChanged: (newValue) {
                           setState(() {
-                            player.flag = newValue ?? false;
-                            if(!player.flag) {
-                              flagReason.text = "";
+                            widget.player.flag = newValue ?? false;
+                            if(!widget.player.flag) {
+                              widget.flagReason.text = "";
                             }
                           });
                         }),
                   ),
                 ),
                 Visibility(
-                  visible: player.flag,
+                  visible: widget.player.flag,
                   child: Flexible(
                     flex: 10,
                     child: Container(
                       child: TextFormField(
                         decoration: InputDecoration(labelText: "Reason"),
-                        controller: flagReason,
+                        controller: widget.flagReason,
                       ),
                     ),
                   ),
@@ -130,7 +104,7 @@ class _PlayerGeneralState extends State {
                 padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                 child: ElevatedButton(
                   onPressed: () {
-                    this.saveFunction(context, player);
+                    this.widget.saveFunction(context, widget.player);
                   },
                   child: Text("Save"),
                 ),

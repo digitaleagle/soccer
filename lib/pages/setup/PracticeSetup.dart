@@ -52,65 +52,67 @@ class _PracticeSetupState extends State<PracticeSetup> {
                 practiceTimeController.value = TimeOfDay.fromDateTime(practice.eventDate);
                 return Form(
                     key: _formKey,
-                    child: Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            DateField(
-                              labelText: "Date of Practice",
-                              controller: practiceDateController,
-                              validator: (newValue) {
-                                if(newValue == null) {
-                                  return "Practice date is required";
-                                }
-                              },
-                            ),
-                            TimeField(
-                              labelText: "Time of Practice",
-                              controller: practiceTimeController,
-                              validator: (newValue) {
-                                if(newValue == null) {
-                                  return "Practice time is required";
-                                }
-                              },
-                            ),
-                            Container(
-                                padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                                child: ElevatedButton(
-                                  child: Text("Save"),
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      DateTime date = practiceDateController.value ?? DateTime.now();
-                                      TimeOfDay? time = practiceTimeController.value;
-                                      if(time == null) {
-                                        time = TimeOfDay.fromDateTime(DateTime.now());
-                                      }
-                                      practice.eventDate = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                    child: SingleChildScrollView(
+                      child: Container(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              DateField(
+                                labelText: "Date of Practice",
+                                controller: practiceDateController,
+                                validator: (newValue) {
+                                  if(newValue == null) {
+                                    return "Practice date is required";
+                                  }
+                                },
+                              ),
+                              TimeField(
+                                labelText: "Time of Practice",
+                                controller: practiceTimeController,
+                                validator: (newValue) {
+                                  if(newValue == null) {
+                                    return "Practice time is required";
+                                  }
+                                },
+                              ),
+                              Container(
+                                  padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+                                  child: ElevatedButton(
+                                    child: Text("Save"),
+                                    onPressed: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        DateTime date = practiceDateController.value ?? DateTime.now();
+                                        TimeOfDay? time = practiceTimeController.value;
+                                        if(time == null) {
+                                          time = TimeOfDay.fromDateTime(DateTime.now());
+                                        }
+                                        practice.eventDate = DateTime(date.year, date.month, date.day, time.hour, time.minute);
 
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text("Saving...")));
-                                      bool isNew = false;
-                                      if (practice.id <= 0) {
-                                        isNew = true;
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content: Text("Saving...")));
+                                        bool isNew = false;
+                                        if (practice.id <= 0) {
+                                          isNew = true;
+                                        }
+                                        await storage.savePractice(practice);
+                                        if (isNew) {
+                                          print("adding to team ${practice.id}");
+                                          args.team.addPractice(practice);
+                                          await storage.saveTeam(args.team);
+                                        }
+                                        ScaffoldMessenger.of(context)
+                                            .hideCurrentSnackBar();
+                                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                                SnackBar(content: Text("Saved")));
                                       }
-                                      await storage.savePractice(practice);
-                                      if (isNew) {
-                                        print("adding to team ${practice.id}");
-                                        args.team.addPractice(practice);
-                                        await storage.saveTeam(args.team);
-                                      }
-                                      ScaffoldMessenger.of(context)
-                                          .hideCurrentSnackBar();
-                                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                              SnackBar(content: Text("Saved")));
-                                    }
-                                  },
-                                ))
-                          ],
-                        )));
+                                    },
+                                  ))
+                            ],
+                          )),
+                    ));
               } else {
                 return CircularProgressIndicator();
               }

@@ -56,78 +56,80 @@ class _GameSetupState extends State<GameSetup> {
                 refreshemntsController.text = game.refreshments;
                 return Form(
                     key: _formKey,
-                    child: Container(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            DateField(
-                              labelText: "Date of Game",
-                              controller: gameDateController,
-                              validator: (newValue) {
-                                if(newValue == null) {
-                                  return "Practice date is required";
-                                }
-                              },
-                            ),
-                            TimeField(
-                              labelText: "Time of Game",
-                              controller: gameTimeController,
-                              validator: (newValue) {
-                                if(newValue == null) {
-                                  return "Practice time is required";
-                                }
-                              },
-                            ),
-                            TextFormField(
-                              decoration: InputDecoration(labelText: "Field"),
-                              controller: fieldController,
-                            ),
-                            TextFormField(
-                              decoration: InputDecoration(labelText: "Opponent"),
-                              controller: opponentController,
-                            ),
-                            TextFormField(
-                              decoration: InputDecoration(labelText: "Refreshments"),
-                              controller: refreshemntsController,
-                            ),
-                            GameCheckboxes(game: game),
-                            Container(
-                                padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                                child: ElevatedButton(
-                                  child: Text("Save"),
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      DateTime date = gameDateController.value ?? DateTime.now();
-                                      TimeOfDay? time = gameTimeController.value;
-                                      game.eventDate = DateTime(date.year, date.month, date.day, time == null ? 0 : time.hour, time == null ? 0 : time.minute);
-                                      game.field = fieldController.text;
-                                      game.opponent = opponentController.text;
-                                      game.refreshments = refreshemntsController.text;
+                    child: SingleChildScrollView(
+                      child: Container(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              DateField(
+                                labelText: "Date of Game",
+                                controller: gameDateController,
+                                validator: (newValue) {
+                                  if(newValue == null) {
+                                    return "Practice date is required";
+                                  }
+                                },
+                              ),
+                              TimeField(
+                                labelText: "Time of Game",
+                                controller: gameTimeController,
+                                validator: (newValue) {
+                                  if(newValue == null) {
+                                    return "Practice time is required";
+                                  }
+                                },
+                              ),
+                              TextFormField(
+                                decoration: InputDecoration(labelText: "Field"),
+                                controller: fieldController,
+                              ),
+                              TextFormField(
+                                decoration: InputDecoration(labelText: "Opponent"),
+                                controller: opponentController,
+                              ),
+                              TextFormField(
+                                decoration: InputDecoration(labelText: "Refreshments"),
+                                controller: refreshemntsController,
+                              ),
+                              GameCheckboxes(game: game),
+                              Container(
+                                  padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+                                  child: ElevatedButton(
+                                    child: Text("Save"),
+                                    onPressed: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        DateTime date = gameDateController.value ?? DateTime.now();
+                                        TimeOfDay? time = gameTimeController.value;
+                                        game.eventDate = DateTime(date.year, date.month, date.day, time == null ? 0 : time.hour, time == null ? 0 : time.minute);
+                                        game.field = fieldController.text;
+                                        game.opponent = opponentController.text;
+                                        game.refreshments = refreshemntsController.text;
 
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text("Saving...")));
-                                      bool isNew = false;
-                                      if (game.id <= 0) {
-                                        isNew = true;
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content: Text("Saving...")));
+                                        bool isNew = false;
+                                        if (game.id <= 0) {
+                                          isNew = true;
+                                        }
+                                        await storage.saveGame(game);
+                                        if (isNew) {
+                                          print("adding to team ${game.id}");
+                                          args.team.addGame(game);
+                                          await storage.saveTeam(args.team);
+                                        }
+                                        ScaffoldMessenger.of(context)
+                                            .hideCurrentSnackBar();
+                                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                                SnackBar(content: Text("Saved")));
                                       }
-                                      await storage.saveGame(game);
-                                      if (isNew) {
-                                        print("adding to team ${game.id}");
-                                        args.team.addGame(game);
-                                        await storage.saveTeam(args.team);
-                                      }
-                                      ScaffoldMessenger.of(context)
-                                          .hideCurrentSnackBar();
-                                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                              SnackBar(content: Text("Saved")));
-                                    }
-                                  },
-                                ))
-                          ],
-                        )));
+                                    },
+                                  ))
+                            ],
+                          )),
+                    ));
               } else {
                 return CircularProgressIndicator();
               }
