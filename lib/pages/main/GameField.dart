@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:soccer/data/Game.dart';
 import 'package:soccer/data/Player.dart';
@@ -27,6 +26,77 @@ class _GameFieldState extends State<GameField> {
 
   @override
   Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Stack(
+        children: [
+          Center(
+            child: Container(
+              padding: EdgeInsets.fromLTRB(0, 75, 0, 0),
+              child: AspectRatio(
+                aspectRatio: 1046/732,
+                child: InteractiveViewer(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      var fieldItems = <Widget>[
+                        const Image(
+                          image: AssetImage("assets/graphics/field.png"),
+                        ),
+                      ];
+                      for (Position position in widget.game.positions) {
+                        var _top = constraints.biggest.height * (position.top / 100) -
+                            (FieldPlayer.height);
+                        var _left = constraints.biggest.width * (position.left / 100);
+
+                        // find the player
+                        Player? player;
+                        bool duplicate = false;
+                        for(var pp in widget.game.byQuarter[widget.game.currentQuarter]!) {
+                          if(pp.position.id == position.id) {
+                            if(player != null) {
+                              duplicate = true;
+                            }
+                            player = pp.player;
+                          }
+                        }
+
+                        fieldItems.add(Positioned(
+                          top: _top,
+                          left: _left,
+                          child: FieldPlayer(
+                            position: position,
+                            positionOnly: false,
+                            player: player,
+                          ),
+                        ));
+                      }
+
+                      return Stack(
+                        children: fieldItems,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              height: 75,
+              width: 300,
+              child: GameQuarter(game: widget.game, onChanged: () {
+                setState(() {});
+              },),
+            ),
+          ),
+        ],
+      ),
+    );
+
+
+
+    // old code
+
     var fieldItems = <Widget>[
       const Image(
         image: AssetImage("assets/graphics/field.png"),
