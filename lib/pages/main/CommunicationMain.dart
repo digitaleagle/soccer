@@ -152,7 +152,8 @@ class _CommunicationMainState extends State<CommunicationMain> {
                                             print("Should send!!");
                                           }
 
-                                          bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+                                          // bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+                                          bool? permissionsGranted = await telephony.requestSmsPermissions;
                                           if(!(permissionsGranted ?? false)) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(SnackBar(
