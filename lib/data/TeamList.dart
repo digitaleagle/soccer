@@ -16,13 +16,18 @@ class TeamList {
     try {
       var obj = jsonDecode(json);
       TeamList team = TeamList();
+
+      team.nextId = obj["nextId"];
+
       team.idList.clear();
       if (obj['idList'].length > 0) {
         for (int id in obj['idList']) {
           team.idList.add(id);
+          if(id >= team.nextId) {
+            team.nextId = id + 1;
+          }
         }
       }
-      team.nextId = obj["nextId"];
       return team;
     } catch (e) {
       print("Failed to load team list: $e");
