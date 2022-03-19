@@ -4,6 +4,7 @@ import 'package:soccer/data/Communication.dart';
 import 'package:soccer/data/CommunicationItem.dart';
 import 'package:soccer/data/CommunicationPlayer.dart';
 import 'package:soccer/nav/args/CommunicationArgs.dart';
+import 'package:soccer/pages/communication/send_sms_dialog.dart';
 import 'package:soccer/pages/main/AddCommunicationScreen.dart';
 import 'package:soccer/pages/main/CommunicationItemScreen.dart';
 import 'package:soccer/service/StorageService.dart';
@@ -130,32 +131,53 @@ class _CommunicationMainState extends State<CommunicationMain> {
                                     padding: EdgeInsets.all(10),
                                     child: ElevatedButton(
                                         onPressed: () async {
-
                                           final Telephony telephony = Telephony.instance;
+
+                                          List<CommunicationItem> addressList = <CommunicationItem>[];
+                                          var items = await communication.items;
+                                          for(var playerItem in items) {
+                                            for(var item in playerItem.items) {
+                                              if(item.isText) {
+                                                addressList.add(item);
+                                              }
+                                            }
+                                          }
+
+                                          // Show dialog to confirm
+                                          if((await SendSMSDialog.showSMSDialog(
+                                            context: context,
+                                            communicationText: communication.text,
+                                            addressList: addressList,
+                                          )) == SendSMSDialogResult.sendText) {
+                                            print("Should send!!");
+                                          }
+
                                           bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+                                          if(!(permissionsGranted ?? false)) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                content: Text("Permission not granted ...")));
+                                            return;
+                                          }
 
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                               content: Text("Sending texts to everyone ...")));
 
-                                          var items = await communication.items;
-                                          for(var playerItem in items) {
-                                            for(var item in playerItem.items) {
-                                              if(item.isText) {
-                                                if(communication.text.length > 160) {
-                                                  telephony.sendSms(
-                                                    to: item.address,
-                                                    message: communication.text,
-                                                    isMultipart: true,
-                                                  );
-                                                } else {
-                                                  telephony.sendSms(
-                                                      to: item.address,
-                                                      message: communication.text);
-                                                }
-                                              }
-                                              item.sent = true;
+                                          //  send the messages
+                                          for(var item in addressList) {
+                                            if(communication.text.length > 160) {
+                                              telephony.sendSms(
+                                                to: item.address,
+                                                message: communication.text,
+                                                isMultipart: true,
+                                              );
+                                            } else {
+                                              telephony.sendSms(
+                                                  to: item.address,
+                                                  message: communication.text);
                                             }
+                                            item.sent = true;
                                           }
 
                                           save(communication);
@@ -178,7 +200,7 @@ class _CommunicationMainState extends State<CommunicationMain> {
 
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
-                                              content: Text("Reseting ...")));
+                                              content: Text("Resetting ...")));
 
                                           var items = await communication.items;
                                           for(var playerItem in items) {
